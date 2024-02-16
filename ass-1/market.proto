@@ -1,0 +1,100 @@
+syntax = "proto3";
+
+// Common
+enum Status {
+  SUCCESS = 0;
+  FAIL = 1;
+}
+message StatusResponse {
+  Status status = 1;
+}
+enum Category {
+  ELECTRONICS = 0;
+  FASHION = 1;
+  OTHERS = 2;
+  ANY = 3;
+}
+message ItemInfo {
+  string name = 1;
+  Category category = 2;
+  int32 quantity = 3;
+  string description = 4;
+  int32 pricePerUnit = 5; 
+}
+message ItemList {
+  repeated int32 itemIDs = 1;
+  repeated ItemInfo itemInfos = 2;
+  repeated string sellerAddresses = 3;
+  repeated float ratings = 4;
+}
+
+// Seller 
+service SellerService {
+  rpc Register (RegistrationRequest) returns (StatusResponse) {}
+  rpc SellItem (SellRequest) returns (StatusResponse) {}
+  rpc UpdateItem (UpdateRequest) returns (StatusResponse) {}
+  rpc DeleteItem (DeleteRequest) returns (StatusResponse) {}
+  rpc DisplayItems (DisplayRequest) returns (ItemList) {}
+}
+message SellerInfo {
+  string address = 1;
+  string uuid = 2;
+}
+message RegistrationRequest {
+  SellerInfo sellerInfo = 1;
+}
+message SellRequest {
+  ItemInfo  itemInfo = 1;
+  SellerInfo sellerInfo = 2;
+}
+message UpdateRequest {
+  int32 itemID = 1;
+  int32 pricePerUnit = 2;
+  int32 quantity = 3;
+  SellerInfo sellerInfo = 4;
+}
+message DeleteRequest {
+ int32 itemID = 1;
+ SellerInfo sellerInfo = 2; 
+}
+message DisplayRequest {
+  SellerInfo sellerInfo = 1;
+}
+
+// Buyer
+service BuyerService {
+  rpc SearchItem (SearchRequest) returns (ItemList) {}
+  rpc BuyItem (BuyRequest) returns (StatusResponse) {}
+  rpc AddToWishList (WishListRequest) returns (StatusResponse) {}
+  rpc RateItem (RateRequest) returns (StatusResponse) {}
+}
+message SearchRequest {
+  string itemName = 1;
+  Category itemCategory = 2; 
+}
+message BuyRequest {
+  int32 itemID = 1;
+  int32 quantity = 2;
+  string address = 3;
+}
+message WishListRequest {
+  int32 itemID = 1;
+  string address = 2;
+}
+message RateRequest {
+  int32 itemID = 1;
+  float rating = 2;
+  string address = 3;
+}
+
+service NotificationService {
+ rpc NotifyClient(UpdateNotification) returns (Empty) {} 
+}
+message UpdateNotification {
+  int32 itemID = 1;
+  ItemInfo itemInfo = 2;
+  float rating = 3;
+  string sellerAddress = 4;
+}
+message Empty{
+}
