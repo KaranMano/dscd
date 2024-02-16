@@ -6,6 +6,7 @@ import logging
 import os
 import signal
 import sys
+import socket
 import uuid
 
 import grpc
@@ -140,6 +141,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.market:
         marketAddress = args.market 
+    ip = socket.gethostbyname(socket.gethostname())
     loadDB()
     run()
     dumpDB()

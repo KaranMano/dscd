@@ -2,6 +2,7 @@ from __future__ import print_function
 import argparse
 from concurrent import futures
 import logging
+import socket
 import utils
 
 import grpc
@@ -88,4 +89,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.market:
         marketAddress = args.market 
+    ip = socket.gethostbyname(socket.gethostname())
     run()
