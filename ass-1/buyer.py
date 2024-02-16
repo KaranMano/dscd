@@ -69,7 +69,7 @@ def run():
 
     with grpc.insecure_channel(marketAddress) as channel:
         TUIManager = utils.TUIManager()
-        TUIManager.addCommand("SEARCH", Search, "SEARCH <category> <name>")
+        TUIManager.addCommand("SEARCH", Search, "SEARCH <category> <name>\n Available categories: ELECTRONICS,FASHION, OTHERS, ANY")
         TUIManager.addCommand("BUY", Buy, "BUY <itemID> <quantity>")
         TUIManager.addCommand("WISH", WishList, "WISH <itemID>")
         TUIManager.addCommand("RATE", Rate, "RATE <itemID> <rating>")

@@ -142,7 +142,7 @@ class SellerService(market_pb2_grpc.SellerServiceServicer):
 
 class BuyerService(market_pb2_grpc.BuyerServiceServicer):
     def SearchItem (self, request, context):
-        print(f"Search request for Item name: {request.itemName}, Category: {request.itemCategory}.")
+        print(f"Search request for Item name: {request.itemName}, Category: {market_pb2.Category.Name(request.itemCategory)}.")
         response = market_pb2.ItemList()
         for itemID, item in enumerate(db["items"]):
             if  item.name.lower().startswith(request.itemName.lower())  \
