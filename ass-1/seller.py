@@ -124,10 +124,11 @@ def run():
         stub = market_pb2_grpc.SellerServiceStub(channel)  
         print(f"Market IP address: {marketAddress}")  
         print("Seller portal, enter HELP for command list")
-        while not isExitCalled:
-            TUIManager.run()
-
-    server.stop(None)
+        try:
+            while not isExitCalled:
+                TUIManager.run()
+        except KeyboardInterrupt as e:
+            server.stop(None)
 
 def sigintHandler(sig, frame):
     dumpDB()
@@ -145,3 +146,4 @@ if __name__ == "__main__":
     loadDB()
     run()
     dumpDB()
+

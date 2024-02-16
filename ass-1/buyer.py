@@ -77,8 +77,11 @@ def run():
         stub = market_pb2_grpc.BuyerServiceStub(channel)    
         print(f"Market IP address: {marketAddress}")
         print("Buyer portal, enter HELP for command list")
-        while not isExitCalled:
-            TUIManager.run()
+        try:
+            while not isExitCalled:
+                TUIManager.run()
+        except KeyboardInterrupt as e:
+            server.stop(None)
 
     server.stop(None)
 
@@ -91,3 +94,5 @@ if __name__ == "__main__":
         marketAddress = args.market 
     ip = socket.gethostbyname(socket.gethostname())
     run()
+    
+        
