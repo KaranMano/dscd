@@ -116,7 +116,7 @@ def run():
     with grpc.insecure_channel(marketAddress) as channel:
         TUIManager = utils.TUIManager()
         TUIManager.addCommand("REGISTER", Register, "REGISTER")
-        TUIManager.addCommand("SELL", Sell, "SELL <name> <category> <quantity> <description> <price-per-unit>")
+        TUIManager.addCommand("SELL", Sell, "SELL <name> <category> <quantity> <description> <price-per-unit>\n Available categories: ELECTRONICS, FASHION, OTHERS")
         TUIManager.addCommand("UPDATE", Update, "UPDATE <itemID> <quantity> <price-per-unit>")
         TUIManager.addCommand("DELETE", Delete, "DELETE <itemID>")
         TUIManager.addCommand("DISPLAY", Display, "DISPLAY")
