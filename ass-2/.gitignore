@@ -1,3 +1,5 @@
 *pb2*
 __pycache__/
-logs*
+logs_*
+nodes.txt
+.vscode

@@ -1,6 +1,7 @@
 import sys
 import socket
-from defs import State, Database, NodeStates
+from database import Database
+from defs import State, NodeStates
 import logging
 from pathlib import Path
 

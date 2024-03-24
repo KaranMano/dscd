@@ -2,6 +2,8 @@ from pathlib import Path
 from enum import Enum
 import json
 import copy
+import sys
+sys.path.append('./proto')
 import node_pb2_grpc
 
 RAFT_PORT = "8888"
@@ -10,25 +12,6 @@ class NodeStates(Enum):
     LEADER = 0
     FOLLOWER = 0
     CANDIDATE = 0
-
-class Database():
-    record = {}
-
-    # node - current Node. Used to resolve path to db file
-    def __init__(self, ID):
-        Path(f"./logs_node_{ID}").mkdir(parents=True, exist_ok=True)
-        self.filePath = f"./logs_node_{ID}/db.txt"
-        if Path(self.filePath).exists():
-            with open(self.filePath, "r") as db:
-                self.record = json.load(db)
-    
-    def __getitem__(self, key):
-        return copy.copy(record[key])
-
-    def commit(self, key, value):
-        self.record[key] = value
-        with open(self.filePath, "w") as db:
-            json.dump(self.record, db)
 
 class RaftLog():
     raw = []
@@ -39,10 +22,15 @@ class RaftLog():
         if Path(self.logFilePath).exists():
             with open(self.logFilePath, "r") as log:
                 self.raw = json.load(log)
+        else:
+            raise FileNotFoundError(logFilePath + " not found")
+        
     def __len__(self):
         return len(self.raw)
+    
     def __iter__(self):
         return self
+
     def __next__(self):
         try:
             result = copy.copy(self.raw[self.index])
@@ -51,11 +39,14 @@ class RaftLog():
             raise StopIteration
         self.index += 1
         return result
+    
     def __getitem__(self, key):
-        return copy.copy(raw[key])
+        return copy.copy(self.raw[key])
 
     def __set_attr__(self, name, value):
-        raise KeyError
+        self.index += 1
+        self.raw[self.index] = dict(name=name, value=value)
+        return copy.copy(self.raw)
     
     def appendAt(self, msg, term, index):
         raw = raw[:index]
@@ -81,9 +72,9 @@ class State():
     def __init__(self, ID, ip):
         self.ID = ID
         self.ip = ip
-        Path(f"./logs_node_{ID}").mkdir(parents=True, exist_ok=True)
-        self.metadataFilePath = f"./logs_node_{ID}/metadata.txt"
-        self.logFilePath = f"./logs_node_{ID}/logs.txt"
+        Path(f"./logs/logs_node_{ID}").mkdir(parents=True, exist_ok=True)
+        self.metadataFilePath = f"./logs/logs_node_{ID}/metadata.txt"
+        self.logFilePath = f"./logs/logs_node_{ID}/logs.txt"
         
         if Path(self.metadataFilePath).exists():
             with open(self.metadataFilePath, "r") as metadata:
@@ -92,7 +83,7 @@ class State():
         log = RaftLog(self.logFilePath)
 
     def __set_attr__(self, name, value):
-        if initialized:
+        if self.initialized:
             if name in ["currentTerm", "votedFor", "commitLength"]:
                 with open(self.metadataFilePath, "w") as metadata:
                     metadata.write("{self.currentTerm} {self.votedFor} {self.commitLength}")
