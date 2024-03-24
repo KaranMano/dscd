@@ -8,7 +8,7 @@ import node_pb2_grpc
 
 RAFT_PORT = "8888"
 
-class NodeStates(Enum):
+class NodeType(Enum):
     LEADER = 0
     FOLLOWER = 0
     CANDIDATE = 0
@@ -23,7 +23,8 @@ class RaftLog():
             with open(self.logFilePath, "r") as log:
                 self.raw = json.load(log)
         else:
-            raise FileNotFoundError(logFilePath + " not found")
+            with open(self.logFilePath, "w") as log:
+                json.dump(self.raw, log)
         
     def __len__(self):
         return len(self.raw)
@@ -32,6 +33,7 @@ class RaftLog():
         return self
 
     def __next__(self):
+        index = 0 
         try:
             result = copy.copy(self.raw[self.index])
         except IndexError:
@@ -44,9 +46,7 @@ class RaftLog():
         return copy.copy(self.raw[key])
 
     def __set_attr__(self, name, value):
-        self.index += 1
-        self.raw[self.index] = dict(name=name, value=value)
-        return copy.copy(self.raw)
+        raise KeyError
     
     def appendAt(self, msg, term, index):
         raw = raw[:index]
@@ -63,7 +63,7 @@ class State():
     currentTerm = 0 
     votedFor = None
     commitLength = 0
-    currentRole = NodeStates.FOLLOWER
+    currentRole = NodeType.FOLLOWER
     currentLeader = None
     votesReceived = set()
     sentLength = 0

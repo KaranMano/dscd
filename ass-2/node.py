@@ -1,7 +1,7 @@
 import sys
 import socket
 from database import Database
-from defs import State, NodeStates
+from defs import State, NodeType
 import logging
 from pathlib import Path
 
@@ -20,8 +20,8 @@ def loadNodes():
             nodes[ID] = ip
 
 def startElection():
-    state.currentTerm += state.currentTerm + 1
-    state.currentRole = NodeStates.CANDIDATE
+    state.currentTerm += + 1
+    state.currentRole = NodeType.CANDIDATE
     state.votedFor = state.ID
     state.votesReceived.add(state.ID)
     lastTerm = 0
