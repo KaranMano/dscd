@@ -1,31 +1,60 @@
 import sys
 import socket
-from defs import *
+from defs import State, Database, NodeStates
+import logging
+from pathlib import Path
 
 # globals
-nodes = []
-currNode = None
+nodes = {}
 state = None
 db = None
-logger = None
+logger = logging.getLogger(__name__)
 
 def loadNodes():
     with open("nodes.txt", "r") as nodeRegistry:
         next(nodeRegistry)
         for entry in nodeRegistry:
-            nodes.append(Node(*entry.split()))
+            ID, ip = entry.split()
+            ID = int(ID)
+            nodes[ID] = ip
 
+def startElection():
+    state.currentTerm += state.currentTerm + 1
+    state.currentRole = NodeStates.CANDIDATE
+    state.votedFor = state.ID
+    state.votesReceived.add(state.ID)
+    lastTerm = 0
+    if len(state.log) > 0:
+        lastTerm = state.log[len(state.log) - 1]["term"]
+    #! create message msg = ("VoteRequest", currNode.id, currentTerm, log.length, lastTerm)
+    for node in nodes:
+        pass
+        #! send rpc
+    #! start election timer
+    
 def run():
     pass
 
-# non-raft global init
+def getIPAddress():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(("8.8.8.8", 80))
+    IPAddr = s.getsockname()[0]
+    s.close()
+    return IPAddr
+
 if __name__ == "__main__":
+    # non-raft globals init
     loadNodes()
-    currID, *_ = nodes(lambda node: node.ip == socket.gethostbyname("localhost"), nodes)
-    if currID == None:
+    ip = getIPAddress()
+    ID, *_ = [key for key, val in nodes.items() if val == ip]
+    if ID == None:
         print("Current IP address has no corresponding entry in nodes.txt")
         sys.exit(-1)
-    state = State(currNode)
-    db = DataBase(currNode)
-    logger = Logger(currNode)
+    Path(f"./logs_node_{ID}").mkdir(parents=True, exist_ok=True)
+    logging.basicConfig(filename=f'./logs_node_{ID}/dump.txt', filemode='w', level=logging.INFO)
+
+    # raft init 
+    state = State(ID, nodes[ID])
+    db = Database(ID)
+
     run()
