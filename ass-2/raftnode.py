@@ -14,7 +14,6 @@ class NodeState(Enum):
     FOLLOWER = 0
     CANDIDATE = 0
 
-
 class RaftNode:
     ID = None
     ip = None

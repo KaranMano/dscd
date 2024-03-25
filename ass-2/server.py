@@ -3,7 +3,7 @@ from pathlib import Path
 import logging
 
 from database import Database
-from defs import RaftNode, NodeState
+from raftnode import RaftNode, NodeState
 from utils import *
 
 # globals
@@ -26,9 +26,9 @@ if __name__ == "__main__":
     if CURRENT_NODE_ID == None:
         print("Current IP address has no corresponding entry in nodes.txt")
         sys.exit(-1)
-    Path(f"./logs_node_{CURRENT_NODE_ID}").mkdir(parents=True, exist_ok=True)
+    Path(f"./logs/logs_node_{CURRENT_NODE_ID}").mkdir(parents=True, exist_ok=True)
     logging.basicConfig(
-        filename=f"./logs_node_{CURRENT_NODE_ID}/dump.txt", 
+        filename=f"./logs/logs_node_{CURRENT_NODE_ID}/dump.txt", 
         filemode="w", 
         level=logging.INFO
     )
