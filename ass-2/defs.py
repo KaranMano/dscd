@@ -1,69 +1,29 @@
 from pathlib import Path
 from enum import Enum
-import json
-import copy
 import sys
-sys.path.append('./proto')
+
+sys.path.append("./proto")
 import node_pb2_grpc
+from log import RaftLog
 
 RAFT_PORT = "8888"
 
-class NodeType(Enum):
+
+class NodeState(Enum):
     LEADER = 0
     FOLLOWER = 0
     CANDIDATE = 0
 
-class RaftLog():
-    raw = []
-    index = 0
 
-    def __init__(self, logFilePath):
-        self.logFilePath = logFilePath
-        if Path(self.logFilePath).exists():
-            with open(self.logFilePath, "r") as log:
-                self.raw = json.load(log)
-        else:
-            with open(self.logFilePath, "w") as log:
-                json.dump(self.raw, log)
-        
-    def __len__(self):
-        return len(self.raw)
-    
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        index = 0 
-        try:
-            result = copy.copy(self.raw[self.index])
-        except IndexError:
-            self.index = 0
-            raise StopIteration
-        self.index += 1
-        return result
-    
-    def __getitem__(self, key):
-        return copy.copy(self.raw[key])
-
-    def __set_attr__(self, name, value):
-        raise KeyError
-    
-    def appendAt(self, msg, term, index):
-        raw = raw[:index]
-        raw.append({"msg": msg, "term": term})
-
-        with open(self.logFilePath, "w") as log:
-            json.dump(self.raw, log)
-
-class State():
+class RaftNode:
     ID = None
     ip = None
     initialized = False
     log = None
-    currentTerm = 0 
+    currentTerm = 0
     votedFor = None
     commitLength = 0
-    currentRole = NodeType.FOLLOWER
+    currentRole = NodeState.FOLLOWER
     currentLeader = None
     votesReceived = set()
     sentLength = 0
@@ -75,10 +35,12 @@ class State():
         Path(f"./logs/logs_node_{ID}").mkdir(parents=True, exist_ok=True)
         self.metadataFilePath = f"./logs/logs_node_{ID}/metadata.txt"
         self.logFilePath = f"./logs/logs_node_{ID}/logs.txt"
-        
+
         if Path(self.metadataFilePath).exists():
             with open(self.metadataFilePath, "r") as metadata:
-                self.currentTerm, self.votedFor, self.commitLength = metadata.readline().split()
+                self.currentTerm, self.votedFor, self.commitLength = (
+                    metadata.readline().split()
+                )
 
         log = RaftLog(self.logFilePath)
 
@@ -86,9 +48,28 @@ class State():
         if self.initialized:
             if name in ["currentTerm", "votedFor", "commitLength"]:
                 with open(self.metadataFilePath, "w") as metadata:
-                    metadata.write("{self.currentTerm} {self.votedFor} {self.commitLength}")
+                    metadata.write(
+                        "{self.currentTerm} {self.votedFor} {self.commitLength}"
+                    )
             else:
-                raise AttributeError(f"State does not allow assignment to .{name} member")
+                raise AttributeError(
+                    f"RaftNode does not allow assignment to .{name} member"
+                )
+
+    def startElection(self, nodes: dict):
+        self.currentTerm += +1
+        self.currentRole = NodeState.CANDIDATE
+        self.votedFor = self.ID
+        self.votesReceived.add(self.ID)
+        lastTerm = 0
+        if len(self.log) > 0:
+            lastTerm = self.log[len(self.log) - 1]["term"]
+        #! create message msg = ("VoteRequest", currNode.id, currentTerm, log.length, lastTerm)
+        for node in nodes:
+            pass
+            #! send rpc
+        #! start election timer
+
 
 def handleStartElectionRPC():
     pass
@@ -109,6 +90,7 @@ def handleStartElectionRPC():
     # send (VoteResponse, nodeId, currentTerm, false) to node cId
     # end if
     # end on
+
 
 def receiveVoteResponse():
     pass
@@ -132,6 +114,7 @@ def receiveVoteResponse():
     # end if
     # end on
 
+
 def broadcast():
     pass
     # on request to broadcast msg at node nodeId do
@@ -153,6 +136,7 @@ def broadcast():
     # end if
     # end do
 
+
 def replicate():
     pass
     # function ReplicateLog(leaderId, followerId)
@@ -166,6 +150,7 @@ def replicate():
     # send (LogRequest, leaderId, currentTerm, prefixLen,
     # prefixTerm, commitLength, suffix ) to followerId
     # end function
+
 
 def lofreq():
     pass
@@ -189,6 +174,7 @@ def lofreq():
     # end if
     # end on
 
+
 def append():
     pass
     # function AppendEntries(prefixLen, leaderCommit, suffix )
@@ -211,6 +197,7 @@ def append():
     # end if
     # end function
 
+
 def logResponse():
     pass
     # on receiving (LogResponse, follower , term, ack, success) at nodeId do
@@ -231,6 +218,7 @@ def logResponse():
     # end if
     # end on
 
+
 def commit():
     pass
     # define acks(length) = |{n ∈ nodes | ackedLength[n] ≥ length}|
@@ -246,8 +234,10 @@ def commit():
     # end if
     # end functio
 
+
 class NodeService(node_pb2_grpc.NodeServiceServicer):
     def AppendEntries():
         pass
+
     def RequestVote():
         pass
