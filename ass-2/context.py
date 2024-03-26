@@ -51,7 +51,7 @@ class Context():
         self.tasks = []
 
         #init
-        logger.info(f"Creating Node {ID} at {ip}:{port}")
+        logger.info(f"Initializing Node {ID} at {ip}:{port}")
 
         self.nodes = nodes
         
@@ -110,17 +110,17 @@ class Context():
     # timer callbacks
     def _acquireLease(self):
         if self.currentRole == NodeStates.LEADER and not self.hasLeaderLease:
-            logger.info(f"Acquiring Lease")
+            logger.info(f"Node {self.ID} became the leader for term {self.currentTerm}.")
             self.hasLeaderLease = True
         elif self.currentRole != NodeStates.LEADER and self.hasLeaderLease:
-            logger.info(f"Relinquishing Lease")
+            logger.info(f"Leader {self.ID} lease renewal failed, stepping down.")
             self.hasLeaderLease = False
         self.leaseTimer.reset()
 
     def _heartbeat(self):
         logger.info(f"_heartbeat: current role {self.currentRole.name}")
         if self.currentRole == NodeStates.LEADER:
-            logger.info(f"Sending heartbeat to followers")
+            logger.info(f"Leader {self.ID} sending heartbeat & Renewing Lease")
             for nodeID, node in enumerate(self.nodes):
                 if nodeID == self.ID:
                     continue
@@ -128,7 +128,7 @@ class Context():
         self.heartbeatTimer.reset()
 
     def _startElection(self):
-        logger.info(f"Starting election")
+        logger.info(f"Node {self.ID} election timer timed out, Starting election.")
         self.currentTerm += 1
         self.currentRole = NodeStates.CANDIDATE
         self.votedFor = self.ID 
@@ -155,6 +155,7 @@ class Context():
             for i in range(self.commitLength, max(ready)):
                 if self.log[i]["msg"].split()[0] == "SET":
                     _, key, value = self.log[i]["msg"].split()
+                    logger.info(f"Node {self.ID} {self.currentRole.name} committed the entry [{key} {value}] to the state machine.")
                     self.db.commit(key, value)
             self.commitLength = max(ready)
 
@@ -207,6 +208,7 @@ class Context():
                 self.votedFor = None
                 self.electionTimer.reset()
         except BaseException:
+            logger.info(f"Error occurred while appending entries to Node {task.result().nodeID}.")
             pass
         finally:
             self.tasks.remove(task)
@@ -215,12 +217,12 @@ class Context():
     def collectVote(self, task):
         try:
             response = task.result()
-            logger.info(f"Processing RequestVote rpc response")
+            logger.info(f"Processing RequestVote RPC response")
             if self.currentRole == NodeStates.CANDIDATE and response.term == self.currentTerm and response.voteGranted:
                 logger.info(f"Got vote from {response.resID}")
                 self.votesReceived.add(response.resID)
             if len(self.votesReceived) >= math.ceil(float(len(self.nodes) + 1)/2.0):
-                logger.info(f"Won election")
+                logger.info(f"Node {self.ID} became the leader for term {self.currentTerm}.")
                 self.currentRole = NodeStates.LEADER 
                 self.currentLeader = self.ID
                 self.electionTimer.stop()
@@ -231,19 +233,20 @@ class Context():
                     self.ackedLength[nodeID] = 0
                     self.replicateLog(nodeID)
             elif response.term > self.currentTerm:
-                logger.info(f"Became follower in election")
+                logger.info(f"Node {self.ID} Stepping down")
                 self.currentTerm = response.term
                 self.currentRole = NodeStates.FOLLOWER
                 self.votedFor = None
                 self.electionTimer.reset()
         except BaseException:
+            logger.info(f"Error occurred while collecting vote from Node {task.result().resID}.")
             pass
         finally:
             self.tasks.remove(task)
 
     # Client functions
     def set(self, key, value):
-        logger.info(f"Client request to set {key} to {value}")
+        logger.info(f"Node {self.id} {self.currentRole} received a SET request")    # similarly log GET
         self.log.appendAt({"msg": f"SET {key} {value}", "term": self.currentTerm})
         self.ackedLength[self.ID] = len(self.log)
         for nodeID, node in enumerate(self.nodes):

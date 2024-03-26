@@ -1,5 +1,6 @@
 from pathlib import Path
 from enum import Enum
+from datetime import datetime
 import sys
 import node_pb2_grpc
 import node_pb2
@@ -15,6 +16,8 @@ ELECTION_INTERVAL = 10
 HEARTBEAT_INTERVAL = 6
 LEASE_INTERVAL = 10
 
+def getCurrentTimeStr():
+    return (datetime.now()).strftime("%H:%M:%S")
 
 class NodeStates(Enum):
     LEADER = 0
@@ -127,8 +130,10 @@ class NodeServicer(node_pb2_grpc.ClientServicer):
         if request.term == self.state.currentTerm and logOk:
             self.state.appendEntries(request.prevLogIndex, request.leaderCommitIndex, request.suffix)
             ack = request.prevLogIndex + len(request.entries)
+            logger.info(f"Node {self.ID} accepted AppendEntries RPC from {request.leaderID}")
             return node_pb2.AppendResponse(nodeID=self.state.ID, ackIndex=ack, term=self.state.currentTerm, success=True)
         else:
+            logger.info(f"Node {self.ID} rejected AppendEntries RPC from {request.leaderID}")
             return node_pb2.AppendResponse(nodeID=self.state.ID, ackIndex=0, term=self.state.currentTerm, success=False)
     
     def RequestVote(self, request, context):
@@ -142,11 +147,11 @@ class NodeServicer(node_pb2_grpc.ClientServicer):
             lastTerm = self.state.log[len(self.state.log) - 1]["term"]
         logOk = (request.lastLogTerm > lastTerm) or (request.lastLogTerm == lastTerm and request.lastLogIndex >= len(self.state.log))
         if request.term == self.state.currentTerm and logOk and self.state.votedFor in [request.candidateId, None]:
-            logger.info(f"Granting vote to {request.candidateId}")
+            logger.info(f"Vote granted for Node {request.candidateId} in term {request.term}")
             self.state.votedFor = request.candidateId
             return node_pb2.VoteResponse(resID=self.state.ID ,term=self.state.currentTerm, voteGranted=True)
         else:
-            logger.info(f"Rejecting vote request from {request.candidateId}")
+            logger.info(f"Vote denied for Node {request.candidateId} in term {request.term}")
             return node_pb2.VoteResponse(resID=self.state.ID ,term=self.state.currentTerm, voteGranted=False)
 
 class ClientServicer(node_pb2_grpc.ClientServicer):

@@ -39,7 +39,7 @@ async def startRaft(ID, ip, port ,nodes):
     node_pb2_grpc.add_ClientServicer_to_server(ClientServicer(state), server)
     listen_addr = f"{ip}:{port}"
     server.add_insecure_port(listen_addr)
-    logging.info("Starting server on %s", listen_addr)
+    logging.info(f"Starting server on {listen_addr}")
     await server.start()
     await server.wait_for_termination()
 
@@ -60,10 +60,10 @@ if __name__ == "__main__":
     
     # logging setup
     Path(f"./logs_node_{ID}").mkdir(parents=True, exist_ok=True)
-    logging.basicConfig(filename=f"./logs_node_{ID}/dump.txt", filemode='w', level=logging.INFO)
+    logging.basicConfig(filename=f"./logs_node_{ID}/dump.txt", filemode='w', format='[%(asctime)s] : %(message)s', datefmt='%I:%M:%S %p', level=logging.INFO)
     logger.info(f"Acquired address: {ID} {ip}:{port}")
 
-    logger.info(nodes)
+    logger.info(f"{nodes}")
     
     # raft init
     asyncio.run(startRaft(ID, ip, port, nodes))

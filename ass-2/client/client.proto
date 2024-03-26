@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package raft;
+
+// The gRPC service definition for Raft
+service Raft {
+  // RPC to serve client requests like GET or SET.
+  // It can also handle requests for leader information or any other client-related operations.
+  rpc ServeClient(ServeClientArgs) returns (ServeClientReply) {}
+}
+
+// Arguments for client requests to the Raft cluster
+message ServeClientArgs {
+  string Request = 1; // The client request, e.g., "GET myKey" or "SET myKey myValue"
+}
+
+// The reply from the Raft cluster to a client request
+message ServeClientReply {
+  string Data = 1; // The data returned by the cluster, e.g., the value for a GET request
+  string LeaderID = 2; // The ID of the leader, if known; could be an address or a unique identifier
+  bool Success = 3; // Indicates if the request was successfully processed
+}
