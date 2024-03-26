@@ -1,3 +1,8 @@
+bin
+.micromamba/
+.vscode/
+nodes.txt
+test.py
 *pb2*
 __pycache__/
 logs*

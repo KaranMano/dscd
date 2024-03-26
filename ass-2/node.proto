@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 // Internal
-service NodeService {
+service Node {
   rpc AppendEntries (AppendRequest) returns (AppendResponse) {}
   rpc RequestVote (VoteRequest) returns (VoteResponse) {}
 }
@@ -16,22 +16,25 @@ message AppendRequest {
 }
 message AppendResponse {
     int32 term = 1;
+    int32 ackIndex = 2;
+    int32 nodeID = 4;
     bool success = 3;    
 }
 
 message VoteRequest {
     int32 term = 1;
-    int32 candidateId = 2;
+    int32 candidateId = 2;  
     int32 lastLogIndex  = 3;
     int32 lastLogTerm = 4;
 }
 message VoteResponse {
+    int32 resID = 3;
     int32 term = 1;
     bool voteGranted = 2;
 }
 
 // Client side
-service ServerService {
+service Client {
     rpc ServeClient (ServeClientArgs) returns (ServeClientReply) {}
 }
 
