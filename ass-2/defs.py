@@ -1,18 +1,20 @@
 from pathlib import Path
 from enum import Enum
-import json
-import copy
+import sys
 import node_pb2_grpc
 import node_pb2
 import grpc
 import asyncio
 import logging
 import random
+import json
 logger = logging.getLogger(__name__)
+import copy
 
 ELECTION_INTERVAL = 10
 HEARTBEAT_INTERVAL = 6
 LEASE_INTERVAL = 10
+
 
 class NodeStates(Enum):
     LEADER = 0

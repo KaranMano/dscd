@@ -5,4 +5,10 @@ nodes.txt
 test.py
 *pb2*
 __pycache__/
+<<<<<<< HEAD
 logs*
+=======
+logs_*
+nodes.txt
+.vscode
+>>>>>>> df5828eb7086838d0dc1a20f5bf80588a01c0836
