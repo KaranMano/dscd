@@ -17,15 +17,6 @@ from context import Context
 # globals
 logger = logging.getLogger(__name__)
 
-def loadNodes():
-    nodes = []
-    with open("nodes.txt", "r") as nodeRegistry:
-        next(nodeRegistry)
-        for entry in nodeRegistry:
-            ID, ip, port = entry.split()
-            nodes.append([ip, port])
-    return nodes
-
 def getLocalIPAddress():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.connect(("8.8.8.8", 80))

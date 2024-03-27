@@ -6,12 +6,16 @@ service Node {
   rpc RequestVote (VoteRequest) returns (VoteResponse) {}
 }
 
+message Entry{
+    string msg = 1;
+    int32 term = 2;
+}
 message AppendRequest {
     int32 term = 1;
     int32 leaderID = 2;
     int32 prevLogIndex = 3;
     int32 prevLogTerm = 4;
-    repeated int32 entries = 5;
+    repeated Entry entries = 5;
     int32 leaderCommitIndex = 6;
 }
 message AppendResponse {
@@ -44,6 +48,6 @@ message ServeClientArgs {
   
 message ServeClientReply {
     string data = 1;
-    string leaderID = 2;
+    int32 leaderID = 2;
     bool success = 3;
 }

@@ -16,6 +16,15 @@ ELECTION_INTERVAL = 10
 HEARTBEAT_INTERVAL = 5
 LEASE_INTERVAL = 10
 
+def loadNodes():
+    nodes = []
+    with open("nodes.txt", "r") as nodeRegistry:
+        next(nodeRegistry)
+        for entry in nodeRegistry:
+            ID, ip, port = entry.split()
+            nodes.append([ip, port])
+    return nodes
+
 def getCurrentTimeStr():
     return (datetime.now()).strftime("%H:%M:%S")
 
@@ -99,14 +108,14 @@ class RaftLog():
         raise KeyError
     
     def appendAt(self, msg, term, index):
-        raw = raw[:index]
-        raw.append({"msg": msg, "term": term})
+        self.raw = self.raw[:index]
+        self.raw.append({"msg": msg, "term": term})
 
         with open(self.logFilePath, "w") as log:
             json.dump(self.raw, log)
 
     def clearAfter(self, index):
-        raw = raw[:index]
+        self.raw = self.raw[:index]
 
 class NodeServicer(node_pb2_grpc.ClientServicer):
     def __init__(self, state):
@@ -124,12 +133,12 @@ class NodeServicer(node_pb2_grpc.ClientServicer):
         logOk = (len(self.state.log) >= request.prevLogIndex) and (request.prevLogIndex == 0 or self.state.log[request.prevLogIndex - 1]["term"] == request.prevLogTerm)
         if request.term == self.state.currentTerm and logOk:
             self.state.electionTimer.reset()
-            self.state.appendEntries(request.prevLogIndex, request.leaderCommitIndex, request.entries)
+            self.state.appendEntries(request.prevLogIndex, request.leaderCommitIndex, [{"msg": entry.msg, "term": entry.term} for entry in request.entries])
             ack = request.prevLogIndex + len(request.entries)
             logger.info(f"[LOG] : Node {self.state.ID} accepted AppendEntries RPC from {request.leaderID}")
             return node_pb2.AppendResponse(nodeID=self.state.ID, ackIndex=ack, term=self.state.currentTerm, success=True)
         else:
-            logger.info(f"[LOG] : Node {self.ID} rejected AppendEntries RPC from {request.leaderID}")
+            logger.info(f"[LOG] : Node {self.state.ID} rejected AppendEntries RPC from {request.leaderID}")
             return node_pb2.AppendResponse(nodeID=self.state.ID, ackIndex=0, term=self.state.currentTerm, success=False)
     
     async def RequestVote(self, request, context):
@@ -156,7 +165,7 @@ class ClientServicer(node_pb2_grpc.ClientServicer):
         self.state = state
 
     def ServeClient(self, request, context):
-        logger.info(f"[LOG] : Client request {request.request}")
+        logger.info(f"[CLIENT] : Client request {request.request}")
         command, *item = request.request.split(",")
         if command == "GET":
             if self.state.currentRole == NodeStates.LEADER and self.state.hasLeaderLease:
@@ -166,8 +175,8 @@ class ClientServicer(node_pb2_grpc.ClientServicer):
         elif command == "SET":
             if self.state.currentRole == NodeStates.LEADER and self.state.hasLeaderLease:
                 self.state.set(*item)
-                return node_pb2.ServeClientReply(data="", leaderID=str(self.state.currentLeader), success=True)
+                return node_pb2.ServeClientReply(data="", leaderID=self.state.currentLeader, success=True)
             else:
-                return node_pb2.ServeClientReply(data="", leaderID=str(self.state.currentLeader), success=False)
+                return node_pb2.ServeClientReply(data="", leaderID=self.state.currentLeader, success=False)
         else:
-            raise ValueError("Command syntax incorrect")
+            logger.info(f"[CLIENT] : Incorrect command syntax")

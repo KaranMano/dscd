@@ -50,8 +50,9 @@ class Context():
 
         # async task management
         self.channels = {}
-        self.tasks = []
-
+        self.tasks = [] 
+        self.tasksMetadata = []
+        
         #init
         logger.info(f"Initializing Node {ID} at {ip}:{port}")
 
@@ -148,6 +149,7 @@ class Context():
             stub = node_pb2_grpc.NodeStub(channel)
             self.tasks.append(asyncio.create_task(self.rpcWrapper(stub.RequestVote, request)))
             self.tasks[-1].add_done_callback(self.collectVote)
+            self.tasksMetadata.append(nodeID)
         self.electionTimer.reset()
 
     # Log update and commit functions
@@ -189,12 +191,17 @@ class Context():
         
         channel = self.getChannel(f"{self.nodes[followerID][0]}:{self.nodes[followerID][1]}")
         stub = node_pb2_grpc.NodeStub(channel)
-        self.tasks.append(asyncio.create_task(self.rpcWrapper(stub.AppendEntries, node_pb2.AppendRequest(
-            term=self.currentTerm, leaderID=self.ID, prevLogIndex=prefixLen, prevLogTerm=prefixTerm, entries=suffix, leaderCommitIndex=self.commitLength
-        ))))
+        entries = [node_pb2.Entry(msg=entry["msg"], term=entry["term"]) for entry in suffix]
+        request = node_pb2.AppendRequest(
+            term=self.currentTerm, leaderID=self.ID, prevLogIndex=prefixLen, prevLogTerm=prefixTerm, entries=entries, leaderCommitIndex=self.commitLength
+        )
+        self.tasks.append(asyncio.create_task(self.rpcWrapper(stub.AppendEntries, request)))
         self.tasks[-1].add_done_callback(self.processLogResponse)
+        self.tasksMetadata.append(followerID)
 
     def processLogResponse(self, task):
+        taskIndex = self.tasks.index(task)
+        followerID = self.tasksMetadata[taskIndex]
         try:
             response = task.result()
             logger.info(f"[LOG] : Processing appendentries rpc response")
@@ -211,14 +218,20 @@ class Context():
                 self.currentRole = NodeStates.FOLLOWER
                 self.votedFor = None
                 self.electionTimer.reset()
+        except grpc.aio.AioRpcError as e:
+            logger.info(f"[LOG] : Error occurred while sending RPC to Node {followerID}. {e.__class__.__name__}")
         except BaseException as e:
             logger.info(f"Error occurred while appending entries, {e.__class__.__name__}")
             # logger.info(traceback.format_exc())
         finally:
+            self.tasksMetadata = self.tasksMetadata[:taskIndex] + self.tasksMetadata[taskIndex+1:]
             self.tasks.remove(task)
+            
 
     # Election functions            
     def collectVote(self, task):
+        taskIndex = self.tasks.index(task)
+        followerID = self.tasksMetadata[taskIndex]
         try:
             response = task.result()
             logger.info(f"[ELECTION] : Processing RequestVote RPC response")
@@ -242,16 +255,19 @@ class Context():
                 self.currentRole = NodeStates.FOLLOWER
                 self.votedFor = None
                 self.electionTimer.reset()
+        except grpc.aio.AioRpcError as e:
+            logger.info(f"[ELECTION] : Error occurred while sending RPC to Node {followerID}. {e.__class__.__name__}")
         except BaseException as e:
             logger.info(f"Error occurred while collecting vote. {e.__class__.__name__}")
             # logger.info(traceback.format_exc())
         finally:
+            self.tasksMetadata = self.tasksMetadata[:taskIndex] + self.tasksMetadata[taskIndex+1:]
             self.tasks.remove(task)
 
     # Client functions
     def set(self, key, value):
-        logger.info(f"[LOG] : Node {self.id} {self.currentRole} received a SET request")    # similarly log GET
-        self.log.appendAt({"msg": f"SET {key} {value}", "term": self.currentTerm})
+        logger.info(f"[CLIENT] : Node {self.ID} {self.currentRole} received a SET request")    # similarly log GET
+        self.log.appendAt(f"SET {key} {value}", self.currentTerm, len(self.log))
         self.ackedLength[self.ID] = len(self.log)
         for nodeID, node in enumerate(self.nodes):
             if node == [self.ip, self.port]:
