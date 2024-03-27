@@ -3,6 +3,7 @@ import socket
 from defs import *
 import logging
 from pathlib import Path
+logging.getLogger('grpc').setLevel(logging.NOTSET)
 import grpc
 import random
 import time

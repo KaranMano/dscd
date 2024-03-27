@@ -9,6 +9,8 @@ import grpc
 import asyncio
 import logging
 import math
+import traceback
+import inspect
 logger = logging.getLogger(__name__)
 
 class Context():
@@ -59,6 +61,9 @@ class Context():
         self.ip = ip
         self.port = port
 
+        self.sentLength = [0 for _ in range(len(self.nodes))]
+        self.ackedLength = [0 for _ in range(len(self.nodes))]
+
         Path(f"./logs_node_{ID}").mkdir(parents=True, exist_ok=True)
         self.db = Database(ID)
         self.logFilePath = f"./logs_node_{ID}/logs.txt"
@@ -68,7 +73,7 @@ class Context():
             with open(self.metadataFilePath, "r") as metadata:
                 self.currentTerm, self.votedFor, self.commitLength = json.load(metadata)
 
-        self.electionTimer = TimedCallback([ELECTION_INTERVAL - 1, ELECTION_INTERVAL + 1], self._startElection, None)
+        self.electionTimer = TimedCallback([ELECTION_INTERVAL - 2, ELECTION_INTERVAL + 2], self._startElection, None)
         self.heartbeatTimer = TimedCallback(HEARTBEAT_INTERVAL, self._heartbeat, None)
         self.leaseTimer = TimedCallback(LEASE_INTERVAL, self._acquireLease, None)
         self._initialized = True
@@ -110,17 +115,16 @@ class Context():
     # timer callbacks
     def _acquireLease(self):
         if self.currentRole == NodeStates.LEADER and not self.hasLeaderLease:
-            logger.info(f"Node {self.ID} became the leader for term {self.currentTerm}.")
+            logger.info(f"[LEASE] : Node {self.ID} acquired the leader for term {self.currentTerm}.")
             self.hasLeaderLease = True
         elif self.currentRole != NodeStates.LEADER and self.hasLeaderLease:
-            logger.info(f"Leader {self.ID} lease renewal failed, stepping down.")
+            logger.info(f"[LEASE] : Leader {self.ID} lease renewal failed, stepping down.")
             self.hasLeaderLease = False
         self.leaseTimer.reset()
 
     def _heartbeat(self):
-        logger.info(f"_heartbeat: current role {self.currentRole.name}")
         if self.currentRole == NodeStates.LEADER:
-            logger.info(f"Leader {self.ID} sending heartbeat & Renewing Lease")
+            logger.info(f"[HEARTBEAT] : Leader {self.ID} sending heartbeat & Renewing Lease")
             for nodeID, node in enumerate(self.nodes):
                 if nodeID == self.ID:
                     continue
@@ -128,7 +132,7 @@ class Context():
         self.heartbeatTimer.reset()
 
     def _startElection(self):
-        logger.info(f"Node {self.ID} election timer timed out, Starting election.")
+        logger.info(f"[ELECTION] : Node {self.ID} election timer timed out, Starting election.")
         self.currentTerm += 1
         self.currentRole = NodeStates.CANDIDATE
         self.votedFor = self.ID 
@@ -148,7 +152,7 @@ class Context():
 
     # Log update and commit functions
     def commitLogEntries(self):
-        logger.info(f"Committing entries")
+        logger.info(f"[LOG] : Committing entries")
         minAcks = math.ceil(float(len(self.nodes) + 1)/2.0)
         ready = [self.log[i] for i in range(len(self.log)) if self.acks(i) >= minAcks]
         if len(ready) != 0 and max(ready) > self.commitLength and self.log[max(ready) - 1]["term"] == self.currentTerm:
@@ -160,7 +164,7 @@ class Context():
             self.commitLength = max(ready)
 
     def appendEntries(self, prefixLen, leaderCommit, suffix):
-        logger.info(f"Append entries")
+        logger.info(f"[LOG] : Append entries")
         if len(suffix) > 0 and len(self.log) > prefixLen:
             index = min(len(self.log), prefixLen + len(suffix)) - 1
             if self.log[index]["term"] != suffix[index - prefixLen]["term"]:
@@ -176,16 +180,16 @@ class Context():
             self.commitLength = leaderCommit
 
     def replicateLog(self, followerID):
-        logger.info(f"Replicating log")
+        logger.info(f"[LOG] : Replicating log")
         prefixLen = self.sentLength[followerID]
         suffix = self.log[prefixLen:]
         prefixTerm = 0
         if prefixLen > 0:
             prefixTerm = self.log[prefixLen - 1]["term"]
         
-        channel = self.getChannel(f"{self.nodes[followerID]}:{self.nodes[followerID]}")
+        channel = self.getChannel(f"{self.nodes[followerID][0]}:{self.nodes[followerID][1]}")
         stub = node_pb2_grpc.NodeStub(channel)
-        self.tasks.append(asyncio.create_task(self.rpcWrapper(stub.AppendRequest, node_pb2.AppendRequest(
+        self.tasks.append(asyncio.create_task(self.rpcWrapper(stub.AppendEntries, node_pb2.AppendRequest(
             term=self.currentTerm, leaderID=self.ID, prevLogIndex=prefixLen, prevLogTerm=prefixTerm, entries=suffix, leaderCommitIndex=self.commitLength
         ))))
         self.tasks[-1].add_done_callback(self.processLogResponse)
@@ -193,7 +197,7 @@ class Context():
     def processLogResponse(self, task):
         try:
             response = task.result()
-            logger.info(f"Processing appendentries rpc response")
+            logger.info(f"[LOG] : Processing appendentries rpc response")
             if response.term == self.currentTerm and self.currentRole == NodeStates.LEADER:
                 if response.success == True and response.ackIndex >= self.ackedLength[response.nodeID]:
                     self.sentLength[response.nodeID ] = response.ackIndex
@@ -207,9 +211,9 @@ class Context():
                 self.currentRole = NodeStates.FOLLOWER
                 self.votedFor = None
                 self.electionTimer.reset()
-        except BaseException:
-            logger.info(f"Error occurred while appending entries to Node {task.result().nodeID}.")
-            pass
+        except BaseException as e:
+            logger.info(f"Error occurred while appending entries, {e.__class__.__name__}")
+            # logger.info(traceback.format_exc())
         finally:
             self.tasks.remove(task)
 
@@ -217,12 +221,12 @@ class Context():
     def collectVote(self, task):
         try:
             response = task.result()
-            logger.info(f"Processing RequestVote RPC response")
+            logger.info(f"[ELECTION] : Processing RequestVote RPC response")
             if self.currentRole == NodeStates.CANDIDATE and response.term == self.currentTerm and response.voteGranted:
-                logger.info(f"Got vote from {response.resID}")
+                logger.info(f"[ELECTION] : Received vote from {response.resID}")
                 self.votesReceived.add(response.resID)
             if len(self.votesReceived) >= math.ceil(float(len(self.nodes) + 1)/2.0):
-                logger.info(f"Node {self.ID} became the leader for term {self.currentTerm}.")
+                logger.info(f"[ELECTION] : Node {self.ID} became the leader for term {self.currentTerm}.")
                 self.currentRole = NodeStates.LEADER 
                 self.currentLeader = self.ID
                 self.electionTimer.stop()
@@ -233,20 +237,20 @@ class Context():
                     self.ackedLength[nodeID] = 0
                     self.replicateLog(nodeID)
             elif response.term > self.currentTerm:
-                logger.info(f"Node {self.ID} Stepping down")
+                logger.info(f"[ELECTION] : Node {self.ID} Stepping down")
                 self.currentTerm = response.term
                 self.currentRole = NodeStates.FOLLOWER
                 self.votedFor = None
                 self.electionTimer.reset()
-        except BaseException:
-            logger.info(f"Error occurred while collecting vote from Node {task.result().resID}.")
-            pass
+        except BaseException as e:
+            logger.info(f"Error occurred while collecting vote. {e.__class__.__name__}")
+            # logger.info(traceback.format_exc())
         finally:
             self.tasks.remove(task)
 
     # Client functions
     def set(self, key, value):
-        logger.info(f"Node {self.id} {self.currentRole} received a SET request")    # similarly log GET
+        logger.info(f"[LOG] : Node {self.id} {self.currentRole} received a SET request")    # similarly log GET
         self.log.appendAt({"msg": f"SET {key} {value}", "term": self.currentTerm})
         self.ackedLength[self.ID] = len(self.log)
         for nodeID, node in enumerate(self.nodes):

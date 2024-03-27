@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 import copy
 
 ELECTION_INTERVAL = 10
-HEARTBEAT_INTERVAL = 6
+HEARTBEAT_INTERVAL = 5
 LEASE_INTERVAL = 10
 
 def getCurrentTimeStr():
@@ -26,7 +26,6 @@ class NodeStates(Enum):
 
 class TimedCallback():
     def __init__(self, duration, callback, data):
-        logger.info(f"Initial start of timer for {callback.__name__}")
         self.data = data
         self.callback = callback
         self.duration = duration
@@ -41,21 +40,17 @@ class TimedCallback():
         self.runningTask = asyncio.create_task(self.callAfterDuration())
 
     async def callAfterDuration(self):
-        logger.info(f"Timer started for {self.callback.__name__} for {self.duration} seconds")
         await asyncio.sleep(self.timeout(self.duration))
-        logger.info(f"Running callback {self.callback.__name__}")
         if self.data:
             self.callback(self.data)
         else:
             self.callback()
 
     def reset(self):
-        logger.info(f"Reseting timer for {self.callback.__name__}")
         self.stop()
         self.runningTask = asyncio.create_task(self.callAfterDuration())
 
     def stop(self):
-        logger.info(f"Stopping timer for {self.callback.__name__}")
         if self.runningTask and not self.runningTask.done():
             self.runningTask.cancel()
 
@@ -117,27 +112,29 @@ class NodeServicer(node_pb2_grpc.ClientServicer):
     def __init__(self, state):
         self.state = state
     
-    def AppendEntries(self, request, context):
-        logger.info(f"Append entries rpc from {request.leaderID}")
+    async def AppendEntries(self, request, context):
+        logger.info(f"[LOG] : Append entries rpc from {request.leaderID}")
         if request.term > self.state.currentTerm:
             self.state.currentTerm = request.term 
             self.state.votedFor = None
-            self.state.electionTimer.reset()
+            self.state.electionTimer.stop()
         if request.term == self.state.currentTerm:
             self.state.currentRole = NodeStates.FOLLOWER 
             self.state.currentLeader = request.leaderID
-        logOk = (len(self.state.log.length) >= request.prevLogIndex) and (request.prevLogIndex == 0 or self.state.log[request.prevLogIndex - 1]["term"] == request.prevLogTerm)
+        logOk = (len(self.state.log) >= request.prevLogIndex) and (request.prevLogIndex == 0 or self.state.log[request.prevLogIndex - 1]["term"] == request.prevLogTerm)
         if request.term == self.state.currentTerm and logOk:
-            self.state.appendEntries(request.prevLogIndex, request.leaderCommitIndex, request.suffix)
+            self.state.electionTimer.reset()
+            self.state.appendEntries(request.prevLogIndex, request.leaderCommitIndex, request.entries)
             ack = request.prevLogIndex + len(request.entries)
-            logger.info(f"Node {self.ID} accepted AppendEntries RPC from {request.leaderID}")
+            logger.info(f"[LOG] : Node {self.state.ID} accepted AppendEntries RPC from {request.leaderID}")
             return node_pb2.AppendResponse(nodeID=self.state.ID, ackIndex=ack, term=self.state.currentTerm, success=True)
         else:
-            logger.info(f"Node {self.ID} rejected AppendEntries RPC from {request.leaderID}")
+            logger.info(f"[LOG] : Node {self.ID} rejected AppendEntries RPC from {request.leaderID}")
             return node_pb2.AppendResponse(nodeID=self.state.ID, ackIndex=0, term=self.state.currentTerm, success=False)
     
-    def RequestVote(self, request, context):
-        logger.info(f"RequestVote RPC from {request.candidateId}")
+    async def RequestVote(self, request, context):
+        logger.info(f"[ELECTION] : RequestVote RPC from {request.candidateId}")
+        self.state.electionTimer.reset()
         if request.term > self.state.currentTerm:
             self.state.currentTerm = request.term
             self.state.currentRole = NodeStates.FOLLOWER
@@ -147,11 +144,11 @@ class NodeServicer(node_pb2_grpc.ClientServicer):
             lastTerm = self.state.log[len(self.state.log) - 1]["term"]
         logOk = (request.lastLogTerm > lastTerm) or (request.lastLogTerm == lastTerm and request.lastLogIndex >= len(self.state.log))
         if request.term == self.state.currentTerm and logOk and self.state.votedFor in [request.candidateId, None]:
-            logger.info(f"Vote granted for Node {request.candidateId} in term {request.term}")
+            logger.info(f"[ELECTION] : Vote granted for Node {request.candidateId} in term {request.term}")
             self.state.votedFor = request.candidateId
             return node_pb2.VoteResponse(resID=self.state.ID ,term=self.state.currentTerm, voteGranted=True)
         else:
-            logger.info(f"Vote denied for Node {request.candidateId} in term {request.term}")
+            logger.info(f"[ELECTION] : Vote denied for Node {request.candidateId} in term {request.term}")
             return node_pb2.VoteResponse(resID=self.state.ID ,term=self.state.currentTerm, voteGranted=False)
 
 class ClientServicer(node_pb2_grpc.ClientServicer):
@@ -159,7 +156,7 @@ class ClientServicer(node_pb2_grpc.ClientServicer):
         self.state = state
 
     def ServeClient(self, request, context):
-        logger.info(f"Client request {request.request}")
+        logger.info(f"[LOG] : Client request {request.request}")
         command, *item = request.request.split(",")
         if command == "GET":
             if self.state.currentRole == NodeStates.LEADER and self.state.hasLeaderLease:
