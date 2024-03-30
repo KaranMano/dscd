@@ -35,6 +35,7 @@ message VoteResponse {
     int32 resID = 3;
     int32 term = 1;
     bool voteGranted = 2;
+    double leaseLeft = 4;
 }
 
 // Client side

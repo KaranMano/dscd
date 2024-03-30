@@ -39,6 +39,7 @@ class Context():
 
         # non peristent metadata
         self.hasLeaderLease = False
+        self.leaseWait = {"end": 0, "max": 0}
         self.currentRole = NodeStates.FOLLOWER
         self.currentLeader = None
         self.votesReceived = set()
@@ -77,6 +78,10 @@ class Context():
         self.electionTimer = TimedCallback([ELECTION_INTERVAL - 2, ELECTION_INTERVAL + 2], self._startElection, None)
         self.heartbeatTimer = TimedCallback(HEARTBEAT_INTERVAL, self._heartbeat, None)
         self.leaseTimer = TimedCallback(LEASE_INTERVAL, self._acquireLease, None)
+        self.electionTimer.reset()
+        self.heartbeatTimer.reset()
+        self.leaseTimer.reset()
+        
         self._initialized = True
 
     def __setattr__(self, name, value):
@@ -115,7 +120,7 @@ class Context():
 
     # timer callbacks
     def _acquireLease(self):
-        if self.currentRole == NodeStates.LEADER and not self.hasLeaderLease:
+        if self.currentRole == NodeStates.LEADER and not self.hasLeaderLease and self.leaseWait["end"] < time.time():
             logger.info(f"[LEASE] : Node {self.ID} acquired the leader for term {self.currentTerm}.")
             self.hasLeaderLease = True
         elif self.currentRole != NodeStates.LEADER and self.hasLeaderLease:
@@ -154,14 +159,14 @@ class Context():
 
     # Log update and commit functions
     def commitLogEntries(self):
-        logger.info(f"[LOG] : Committing entries")
         minAcks = math.ceil(float(len(self.nodes) + 1)/2.0)
-        ready = [self.log[i] for i in range(len(self.log)) if self.acks(i) >= minAcks]
+        ready = [i+1 for i in range(len(self.log)) if self.acks(i) >= minAcks]
         if len(ready) != 0 and max(ready) > self.commitLength and self.log[max(ready) - 1]["term"] == self.currentTerm:
+            logger.info(f"[LOG] : Committing entries")
             for i in range(self.commitLength, max(ready)):
                 if self.log[i]["msg"].split()[0] == "SET":
                     _, key, value = self.log[i]["msg"].split()
-                    logger.info(f"Node {self.ID} {self.currentRole.name} committed the entry [{key} {value}] to the state machine.")
+                    logger.info(f"[LOG] Node {self.ID} {self.currentRole.name} committed the entry [{key} {value}] to the state machine.")
                     self.db.commit(key, value)
             self.commitLength = max(ready)
 
@@ -222,7 +227,7 @@ class Context():
             logger.info(f"[LOG] : Error occurred while sending RPC to Node {followerID}. {e.__class__.__name__}")
         except BaseException as e:
             logger.info(f"Error occurred while appending entries, {e.__class__.__name__}")
-            # logger.info(traceback.format_exc())
+            logger.info(traceback.format_exc())
         finally:
             self.tasksMetadata = self.tasksMetadata[:taskIndex] + self.tasksMetadata[taskIndex+1:]
             self.tasks.remove(task)
@@ -238,11 +243,15 @@ class Context():
             if self.currentRole == NodeStates.CANDIDATE and response.term == self.currentTerm and response.voteGranted:
                 logger.info(f"[ELECTION] : Received vote from {response.resID}")
                 self.votesReceived.add(response.resID)
+                self.leaseWait["max"] = max(self.leaseWait["max"] , response.leaseLeft)
             if len(self.votesReceived) >= math.ceil(float(len(self.nodes) + 1)/2.0):
                 logger.info(f"[ELECTION] : Node {self.ID} became the leader for term {self.currentTerm}.")
                 self.currentRole = NodeStates.LEADER 
                 self.currentLeader = self.ID
                 self.electionTimer.stop()
+                self.leaseWait["end"] = time.time() + self.leaseWait["max"] 
+                self.hasLeaderLease = False
+                logger.info(f"[LEASE] Will wait for {self.leaseWait['max']} which will end at {self.leaseWait['end']} before acquiring lease")
                 for nodeID, node in enumerate(self.nodes):
                     if node == [self.ip, self.port]:
                         continue
@@ -255,6 +264,7 @@ class Context():
                 self.currentRole = NodeStates.FOLLOWER
                 self.votedFor = None
                 self.electionTimer.reset()
+                self.leaseWait["max"] = 0
         except grpc.aio.AioRpcError as e:
             logger.info(f"[ELECTION] : Error occurred while sending RPC to Node {followerID}. {e.__class__.__name__}")
         except BaseException as e:

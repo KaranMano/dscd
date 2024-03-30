@@ -26,8 +26,8 @@ class TUIManager:
 
     def run(self):
         command, *args = input().split()
-        if command in self.commandMap.keys():
-            self.commandMap[command](args, self)
+        if command.upper() in self.commandMap.keys():
+            self.commandMap[command.upper()](args, self)
         else:
             print("Undefined command enter HELP to get full command list")
 
