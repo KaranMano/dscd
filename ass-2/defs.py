@@ -165,7 +165,8 @@ class NodeServicer(node_pb2_grpc.ClientServicer):
     
     async def RequestVote(self, request, context):
         logger.info(f"[ELECTION] : RequestVote RPC from {request.candidateId}")
-        self.state.electionTimer.reset()
+        if self.state.currentRole != NodeStates.LEADER:
+            self.state.electionTimer.reset()
         if request.term > self.state.currentTerm:
             self.state.currentTerm = request.term
             self.state.currentRole = NodeStates.FOLLOWER
@@ -196,7 +197,7 @@ class ClientServicer(node_pb2_grpc.ClientServicer):
             else:
                 return node_pb2.ServeClientReply(data="", leaderID=self.state.currentLeader, success=False)
         elif command == "SET":
-            if self.state.currentRole == NodeStates.LEADER and self.state.hasLeaderLease:
+            if self.state.currentRole == NodeStates.LEADER and self.state.hasLeaderLease and self.state.hasWritePermission:
                 self.state.set(*item)
                 return node_pb2.ServeClientReply(data="", leaderID=self.state.currentLeader, success=True)
             else:

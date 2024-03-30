@@ -4,6 +4,7 @@ import node_pb2
 import node_pb2_grpc
 from defs import *
 from concurrent import futures
+import traceback
 
 stub = None
 isExitCalled = False
@@ -49,20 +50,28 @@ def Set(args, manager):
         value = ' '.join(value)
     except:
         manager.notifyParseError()
-    while True:
+    
+    startTime = time.time()
+    while (time.time() - startTime) < 10:
         try:
             response = stub.ServeClient(
                 node_pb2.ServeClientArgs(request=f"SET, {key}, {value}")
             )
             if not response.success:
+                if response.leaderID == leaderID:
+                    time.sleep(1)
+                channel.close()
                 leaderID = response.leaderID
                 channel = grpc.insecure_channel(f"{nodes[leaderID][0]}:{nodes[leaderID][1]}")
                 stub = node_pb2_grpc.ClientStub(channel)
             else:
-                print(response)
                 return
         except BaseException as e:
+            print(f"Could not connect to leader {leaderID}")
+            channel.close()
             leaderID = (leaderID + 1) % (len(nodes) - 1)
+            channel = grpc.insecure_channel(f"{nodes[leaderID][0]}:{nodes[leaderID][1]}")
+            stub = node_pb2_grpc.ClientStub(channel)
 
 def Get(args, manager):
     global channel
@@ -72,19 +81,29 @@ def Get(args, manager):
         key = args[0]
     except:
         manager.notifyParseError()
-    while True:
+    
+    startTime = time.time()
+    while (time.time() - startTime) < 10:
         try:
             response = stub.ServeClient(node_pb2.ServeClientArgs(request=f"GET, {key}"))
             print(response)
             if not response.success:
+                if response.leaderID == leaderID:
+                    print(f"Leader {leaderID} seems to be waiting for lease.")
+                    time.sleep(1)
+                channel.close()
                 leaderID = response.leaderID
                 channel = grpc.insecure_channel(f"{nodes[leaderID][0]}:{nodes[leaderID][1]}")
                 stub = node_pb2_grpc.ClientStub(channel)
             else:
-                print(response)
                 return
-        except BaseException:
+        except BaseException as e:
+            print(f"Could not connect to leader {leaderID}")
+            channel.close()
             leaderID = (leaderID + 1) % (len(nodes) - 1)
+            channel = grpc.insecure_channel(f"{nodes[leaderID][0]}:{nodes[leaderID][1]}")
+            stub = node_pb2_grpc.ClientStub(channel)
+            
 
 def Exit(args, manager):
     global isExitCalled

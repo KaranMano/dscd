@@ -48,6 +48,7 @@ class Context():
         self.electionTimer = None
         self.heartbeatTimer = None
         self.leaseTimer = None
+        self.hasWritePermission = False
 
         # async task management
         self.channels = {}
@@ -123,6 +124,7 @@ class Context():
         if self.currentRole == NodeStates.LEADER and not self.hasLeaderLease and self.leaseWait["end"] < time.time():
             logger.info(f"[LEASE] : Node {self.ID} acquired the leader for term {self.currentTerm}.")
             self.hasLeaderLease = True
+            self.log.appendAt(f"NO-OP {self.currentTerm}", self.currentTerm, len(self.log))
         elif self.currentRole != NodeStates.LEADER and self.hasLeaderLease:
             logger.info(f"[LEASE] : Leader {self.ID} lease renewal failed, stepping down.")
             self.hasLeaderLease = False
@@ -139,6 +141,7 @@ class Context():
 
     def _startElection(self):
         logger.info(f"[ELECTION] : Node {self.ID} election timer timed out, Starting election.")
+        self.votesReceived.clear()
         self.currentTerm += 1
         self.currentRole = NodeStates.CANDIDATE
         self.votedFor = self.ID 
@@ -165,9 +168,11 @@ class Context():
             logger.info(f"[LOG] : Committing entries")
             for i in range(self.commitLength, max(ready)):
                 if self.log[i]["msg"].split()[0] == "SET":
-                    _, key, value = self.log[i]["msg"].split()
-                    logger.info(f"[LOG] Node {self.ID} {self.currentRole.name} committed the entry [{key} {value}] to the state machine.")
-                    self.db.commit(key, value)
+                    _, key, *value = self.log[i]["msg"].split()
+                    logger.info(f"[LOG] Node {self.ID} {self.currentRole.name} committed the entry [{key} {' '.join(value)}] to the state machine.")
+                    self.db.commit(key, " ".join(value))
+                elif self.log[i]["msg"].split()[0] == "NO-OP":
+                    self.hasWritePermission = True                    
             self.commitLength = max(ready)
 
     def appendEntries(self, prefixLen, leaderCommit, suffix):
@@ -182,8 +187,8 @@ class Context():
         if leaderCommit > self.commitLength:
             for i in range(self.commitLength, leaderCommit):
                 if self.log[i]["msg"].split()[0] == "SET":
-                    _, key, value = self.log[i]["msg"].split()
-                    self.db.commit(key, value)
+                    _, key, *value = self.log[i]["msg"].split()
+                    self.db.commit(key, ' '.join(value))
             self.commitLength = leaderCommit
 
     def replicateLog(self, followerID):
@@ -217,7 +222,7 @@ class Context():
                     self.commitLogEntries()
                 elif self.sentLength[response.nodeID] > 0:
                     self.sentLength[response.nodeID] = self.sentLength[response.nodeID ] - 1
-                    self.replicateLog(response.nodeId)
+                    self.replicateLog(response.nodeID)
             elif response.term > self.currentTerm:
                 self.currentTerm = response.term
                 self.currentRole = NodeStates.FOLLOWER
@@ -244,6 +249,8 @@ class Context():
                 logger.info(f"[ELECTION] : Received vote from {response.resID}")
                 self.votesReceived.add(response.resID)
                 self.leaseWait["max"] = max(self.leaseWait["max"] , response.leaseLeft)
+            logger.info(f"Votes received: {self.votesReceived}")
+            logger.info(f"DEBUG: ceil: {math.ceil(float(len(self.nodes) + 1)/2.0)} non ceil: {float(len(self.nodes) + 1)/2.0}")
             if len(self.votesReceived) >= math.ceil(float(len(self.nodes) + 1)/2.0):
                 logger.info(f"[ELECTION] : Node {self.ID} became the leader for term {self.currentTerm}.")
                 self.currentRole = NodeStates.LEADER 
@@ -265,6 +272,7 @@ class Context():
                 self.votedFor = None
                 self.electionTimer.reset()
                 self.leaseWait["max"] = 0
+                self.hasWritePermission = False
         except grpc.aio.AioRpcError as e:
             logger.info(f"[ELECTION] : Error occurred while sending RPC to Node {followerID}. {e.__class__.__name__}")
         except BaseException as e:
