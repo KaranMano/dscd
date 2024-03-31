@@ -13,9 +13,9 @@ logger = logging.getLogger(__name__)
 import copy
 import time
 
-ELECTION_INTERVAL = 10
-HEARTBEAT_INTERVAL = 5
-LEASE_INTERVAL = 2
+ELECTION_INTERVAL = [5, 10]
+HEARTBEAT_INTERVAL = 1
+LEASE_INTERVAL = 6
 
 def loadNodes():
     nodes = []
@@ -151,9 +151,11 @@ class NodeServicer(node_pb2_grpc.ClientServicer):
         if request.term == self.state.currentTerm:
             self.state.currentRole = NodeStates.FOLLOWER 
             self.state.currentLeader = request.leaderID
+            self.state.electionTimer.reset()
         logOk = (len(self.state.log) >= request.prevLogIndex) and (request.prevLogIndex == 0 or self.state.log[request.prevLogIndex - 1]["term"] == request.prevLogTerm)
         if request.term == self.state.currentTerm and logOk:
-            self.state.leaseTimer.reset()
+            # self.state.leaseTimer.reset()
+            self.state.heartbeatTimer.reset()
             self.state.electionTimer.reset()
             self.state.appendEntries(request.prevLogIndex, request.leaderCommitIndex, [{"msg": entry.msg, "term": entry.term} for entry in request.entries])
             ack = request.prevLogIndex + len(request.entries)
@@ -177,12 +179,13 @@ class NodeServicer(node_pb2_grpc.ClientServicer):
         logOk = (request.lastLogTerm > lastTerm) or (request.lastLogTerm == lastTerm and request.lastLogIndex >= len(self.state.log))
         if request.term == self.state.currentTerm and logOk and self.state.votedFor in [request.candidateId, None]:
             logger.info(f"[ELECTION] : Vote granted for Node {request.candidateId} in term {request.term}")
-            self.state.leaseTimer.reset()
+            # self.state.leaseTimer.reset()
+            self.state.heartbeatTimer.reset()
             self.state.votedFor = request.candidateId
-            return node_pb2.VoteResponse(resID=self.state.ID ,term=self.state.currentTerm, voteGranted=True, leaseLeft=self.state.leaseTimer.getTimeLeft())
+            return node_pb2.VoteResponse(resID=self.state.ID ,term=self.state.currentTerm, voteGranted=True, leaseLeft=self.state.heartbeatTimer.getTimeLeft())
         else:
             logger.info(f"[ELECTION] : Vote denied for Node {request.candidateId} in term {request.term}")
-            return node_pb2.VoteResponse(resID=self.state.ID ,term=self.state.currentTerm, voteGranted=False, leaseLeft=self.state.leaseTimer.getTimeLeft())
+            return node_pb2.VoteResponse(resID=self.state.ID ,term=self.state.currentTerm, voteGranted=False, leaseLeft=self.state.heartbeatTimer.getTimeLeft())
 
 class ClientServicer(node_pb2_grpc.ClientServicer):
     def __init__(self, state):

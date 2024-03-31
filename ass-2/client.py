@@ -65,13 +65,17 @@ def Set(args, manager):
                 channel = grpc.insecure_channel(f"{nodes[leaderID][0]}:{nodes[leaderID][1]}")
                 stub = node_pb2_grpc.ClientStub(channel)
             else:
+                print(f"data: {response.data}")
+                print(f"leader: {response.leaderID}")
+                print(f"success: {response.success}")
                 return
         except BaseException as e:
             print(f"Could not connect to leader {leaderID}")
             channel.close()
-            leaderID = (leaderID + 1) % (len(nodes) - 1)
+            leaderID = (leaderID + 1) % len(nodes)
             channel = grpc.insecure_channel(f"{nodes[leaderID][0]}:{nodes[leaderID][1]}")
             stub = node_pb2_grpc.ClientStub(channel)
+    print(f"Could not SET {' '.join(args)}")
 
 def Get(args, manager):
     global channel
@@ -86,7 +90,6 @@ def Get(args, manager):
     while (time.time() - startTime) < 10:
         try:
             response = stub.ServeClient(node_pb2.ServeClientArgs(request=f"GET, {key}"))
-            print(response)
             if not response.success:
                 if response.leaderID == leaderID:
                     print(f"Leader {leaderID} seems to be waiting for lease.")
@@ -96,13 +99,18 @@ def Get(args, manager):
                 channel = grpc.insecure_channel(f"{nodes[leaderID][0]}:{nodes[leaderID][1]}")
                 stub = node_pb2_grpc.ClientStub(channel)
             else:
+                print(f"data: {response.data}")
+                print(f"leader: {response.leaderID}")
+                print(f"success: {response.success}")
                 return
         except BaseException as e:
             print(f"Could not connect to leader {leaderID}")
             channel.close()
-            leaderID = (leaderID + 1) % (len(nodes) - 1)
+            leaderID = (leaderID + 1) % len(nodes)
             channel = grpc.insecure_channel(f"{nodes[leaderID][0]}:{nodes[leaderID][1]}")
             stub = node_pb2_grpc.ClientStub(channel)
+    print(f"Could not GET {' '.join(args)}")
+
             
 
 def Exit(args, manager):

@@ -79,12 +79,12 @@ class Context():
             with open(self.metadataFilePath, "r") as metadata:
                 self.currentTerm, self.votedFor, self.commitLength = json.load(metadata)
 
-        self.electionTimer = TimedCallback([ELECTION_INTERVAL - 2, ELECTION_INTERVAL + 2], self._startElection, None)
+        self.electionTimer = TimedCallback(ELECTION_INTERVAL, self._startElection, None)
         self.heartbeatTimer = TimedCallback(HEARTBEAT_INTERVAL, self._heartbeat, None)
-        self.leaseTimer = TimedCallback(LEASE_INTERVAL, self._acquireLease, None)
+        # self.leaseTimer = TimedCallback(LEASE_INTERVAL, self._acquireLease, None)
         self.electionTimer.reset()
         self.heartbeatTimer.reset()
-        self.leaseTimer.reset()
+        # self.leaseTimer.reset()
         
         self._initialized = True
 
@@ -127,18 +127,22 @@ class Context():
         if self.currentRole == NodeStates.LEADER:
             if self.leaseWait["end"] < time.time() \
                 and self.heartBeatsAcked.count(True) >= math.ceil(float(len(self.nodes) + 1)/2.0):
-                logger.info(f"[LEASE] : Acquired lease for term {self.currentTerm}.")
-                self.hasLeaderLease = True
-                self.log.appendAt(f"NO-OP {self.currentTerm}", self.currentTerm, len(self.log))
+                if self.hasLeaderLease:
+                    logger.info(f"[LEASE] : Renewed lease for term {self.currentTerm}.")
+                else:
+                    logger.info(f"[LEASE] : Acquired lease for term {self.currentTerm}.")
+                    self.hasLeaderLease = True
+                    self.log.appendAt(f"NO-OP {self.currentTerm}", self.currentTerm, len(self.log))
             else:
                 logger.info(f"[LEASE] : Leader {self.ID} lease renewal failed, stepping down.")
                 self.hasLeaderLease = False
         elif self.currentRole != NodeStates.LEADER and self.hasLeaderLease:
             logger.info(f"[LEASE] : Leader {self.ID} lease renewal failed, stepping down.")
             self.hasLeaderLease = False
-        self.leaseTimer.reset()
+        # self.leaseTimer.reset()
 
     def _heartbeat(self):
+        self._acquireLease()
         if self.currentRole == NodeStates.LEADER:
             logger.info(f"[HEARTBEAT] : Leader {self.ID} sending heartbeat & Renewing Lease")
             self.heartBeatsAcked = [False for _ in range(len(self.nodes))]
@@ -240,9 +244,9 @@ class Context():
                 self.electionTimer.reset()
         except grpc.aio.AioRpcError as e:
             logger.info(f"[LOG] : Error occurred while sending RPC to Node {followerID}. {e.__class__.__name__}")
+            # logger.info(traceback.format_exc())
         except BaseException as e:
             logger.info(f"Error occurred while appending entries, {e.__class__.__name__}")
-            # logger.info(traceback.format_exc())
         finally:
             self.tasksMetadata = self.tasksMetadata[:taskIndex] + self.tasksMetadata[taskIndex+1:]
             self.tasks.remove(task)
