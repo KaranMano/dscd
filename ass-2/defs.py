@@ -15,7 +15,7 @@ import time
 
 ELECTION_INTERVAL = 10
 HEARTBEAT_INTERVAL = 5
-LEASE_INTERVAL = 10
+LEASE_INTERVAL = 2
 
 def loadNodes():
     nodes = []

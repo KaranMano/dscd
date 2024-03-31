@@ -37,10 +37,9 @@ async def startRaft(ID, ip, port ,nodes):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-p", "--port", help="The port of the node")
-    parser.add_argument("-i", "--id", help="The id of the node")
+    parser.add_argument("-i", "--id", help="The id of the node", type=int)
     args = parser.parse_args()
-    if not (args.port and args.id):
+    if args.id == None:
         print("port and id needed")
         sys.exit(-1) 
 
@@ -48,7 +47,7 @@ if __name__ == "__main__":
     nodes = loadNodes()
     ID = args.id
     ip = getLocalIPAddress()
-    port = args.port
+    port = nodes[ID][1]
     
     # logging setup
     Path(f"./logs_node_{ID}").mkdir(parents=True, exist_ok=True)

@@ -49,6 +49,7 @@ class Context():
         self.heartbeatTimer = None
         self.leaseTimer = None
         self.hasWritePermission = False
+        self.heartBeatsAcked = []
 
         # async task management
         self.channels = {}
@@ -66,6 +67,8 @@ class Context():
 
         self.sentLength = [0 for _ in range(len(self.nodes))]
         self.ackedLength = [0 for _ in range(len(self.nodes))]
+        self.heartBeatsAcked = [False for _ in range(len(self.nodes))]
+        self.heartBeatsAcked[self.ID] = True
 
         Path(f"./logs_node_{ID}").mkdir(parents=True, exist_ok=True)
         self.db = Database(ID)
@@ -104,6 +107,12 @@ class Context():
             if self.ackedLength[nodeID] >= length:
                 numberOfAcks += 1
         return numberOfAcks
+    
+    async def rpcWrapper(self, call, request):
+        try:
+            return await call(request)
+        except BaseException:
+            raise
 
     def getChannel(self, addr):
         channel = None
@@ -113,18 +122,17 @@ class Context():
             channel = self.channels[addr] = grpc.aio.insecure_channel(addr)
         return channel
 
-    async def rpcWrapper(self, call, request):
-        try:
-            return await call(request)
-        except BaseException:
-            raise
-
     # timer callbacks
     def _acquireLease(self):
-        if self.currentRole == NodeStates.LEADER and not self.hasLeaderLease and self.leaseWait["end"] < time.time():
-            logger.info(f"[LEASE] : Node {self.ID} acquired the leader for term {self.currentTerm}.")
-            self.hasLeaderLease = True
-            self.log.appendAt(f"NO-OP {self.currentTerm}", self.currentTerm, len(self.log))
+        if self.currentRole == NodeStates.LEADER:
+            if self.leaseWait["end"] < time.time() \
+                and self.heartBeatsAcked.count(True) >= math.ceil(float(len(self.nodes) + 1)/2.0):
+                logger.info(f"[LEASE] : Acquired lease for term {self.currentTerm}.")
+                self.hasLeaderLease = True
+                self.log.appendAt(f"NO-OP {self.currentTerm}", self.currentTerm, len(self.log))
+            else:
+                logger.info(f"[LEASE] : Leader {self.ID} lease renewal failed, stepping down.")
+                self.hasLeaderLease = False
         elif self.currentRole != NodeStates.LEADER and self.hasLeaderLease:
             logger.info(f"[LEASE] : Leader {self.ID} lease renewal failed, stepping down.")
             self.hasLeaderLease = False
@@ -133,10 +141,12 @@ class Context():
     def _heartbeat(self):
         if self.currentRole == NodeStates.LEADER:
             logger.info(f"[HEARTBEAT] : Leader {self.ID} sending heartbeat & Renewing Lease")
+            self.heartBeatsAcked = [False for _ in range(len(self.nodes))]
+            self.heartBeatsAcked[self.ID] = True
             for nodeID, node in enumerate(self.nodes):
                 if nodeID == self.ID:
                     continue
-                self.replicateLog(nodeID)
+                self.replicateLog(nodeID, "heartbeat")
         self.heartbeatTimer.reset()
 
     def _startElection(self):
@@ -176,7 +186,6 @@ class Context():
             self.commitLength = max(ready)
 
     def appendEntries(self, prefixLen, leaderCommit, suffix):
-        logger.info(f"[LOG] : Append entries")
         if len(suffix) > 0 and len(self.log) > prefixLen:
             index = min(len(self.log), prefixLen + len(suffix)) - 1
             if self.log[index]["term"] != suffix[index - prefixLen]["term"]:
@@ -191,8 +200,7 @@ class Context():
                     self.db.commit(key, ' '.join(value))
             self.commitLength = leaderCommit
 
-    def replicateLog(self, followerID):
-        logger.info(f"[LOG] : Replicating log")
+    def replicateLog(self, followerID, name):
         prefixLen = self.sentLength[followerID]
         suffix = self.log[prefixLen:]
         prefixTerm = 0
@@ -205,7 +213,7 @@ class Context():
         request = node_pb2.AppendRequest(
             term=self.currentTerm, leaderID=self.ID, prevLogIndex=prefixLen, prevLogTerm=prefixTerm, entries=entries, leaderCommitIndex=self.commitLength
         )
-        self.tasks.append(asyncio.create_task(self.rpcWrapper(stub.AppendEntries, request)))
+        self.tasks.append(asyncio.create_task(self.rpcWrapper(stub.AppendEntries, request), name=name))
         self.tasks[-1].add_done_callback(self.processLogResponse)
         self.tasksMetadata.append(followerID)
 
@@ -214,7 +222,9 @@ class Context():
         followerID = self.tasksMetadata[taskIndex]
         try:
             response = task.result()
-            logger.info(f"[LOG] : Processing appendentries rpc response")
+            logger.info(f"[LOG] : Processing appendentries rpc response; {task.get_name()}")
+            if task.get_name() == "heartbeat":
+                self.heartBeatsAcked[response.nodeID] = True
             if response.term == self.currentTerm and self.currentRole == NodeStates.LEADER:
                 if response.success == True and response.ackIndex >= self.ackedLength[response.nodeID]:
                     self.sentLength[response.nodeID ] = response.ackIndex
@@ -222,7 +232,7 @@ class Context():
                     self.commitLogEntries()
                 elif self.sentLength[response.nodeID] > 0:
                     self.sentLength[response.nodeID] = self.sentLength[response.nodeID ] - 1
-                    self.replicateLog(response.nodeID)
+                    self.replicateLog(response.nodeID, "processLogResponse")
             elif response.term > self.currentTerm:
                 self.currentTerm = response.term
                 self.currentRole = NodeStates.FOLLOWER
@@ -232,7 +242,7 @@ class Context():
             logger.info(f"[LOG] : Error occurred while sending RPC to Node {followerID}. {e.__class__.__name__}")
         except BaseException as e:
             logger.info(f"Error occurred while appending entries, {e.__class__.__name__}")
-            logger.info(traceback.format_exc())
+            # logger.info(traceback.format_exc())
         finally:
             self.tasksMetadata = self.tasksMetadata[:taskIndex] + self.tasksMetadata[taskIndex+1:]
             self.tasks.remove(task)
@@ -244,14 +254,13 @@ class Context():
         followerID = self.tasksMetadata[taskIndex]
         try:
             response = task.result()
-            logger.info(f"[ELECTION] : Processing RequestVote RPC response")
             if self.currentRole == NodeStates.CANDIDATE and response.term == self.currentTerm and response.voteGranted:
                 logger.info(f"[ELECTION] : Received vote from {response.resID}")
                 self.votesReceived.add(response.resID)
                 self.leaseWait["max"] = max(self.leaseWait["max"] , response.leaseLeft)
-            logger.info(f"Votes received: {self.votesReceived}")
-            logger.info(f"DEBUG: ceil: {math.ceil(float(len(self.nodes) + 1)/2.0)} non ceil: {float(len(self.nodes) + 1)/2.0}")
             if len(self.votesReceived) >= math.ceil(float(len(self.nodes) + 1)/2.0):
+                if self.currentRole == NodeStates.LEADER: #! hacky
+                    return
                 logger.info(f"[ELECTION] : Node {self.ID} became the leader for term {self.currentTerm}.")
                 self.currentRole = NodeStates.LEADER 
                 self.currentLeader = self.ID
@@ -264,7 +273,7 @@ class Context():
                         continue
                     self.sentLength[nodeID] = len(self.log)
                     self.ackedLength[nodeID] = 0
-                    self.replicateLog(nodeID)
+                    self.replicateLog(nodeID, "collectVote")
             elif response.term > self.currentTerm:
                 logger.info(f"[ELECTION] : Node {self.ID} Stepping down")
                 self.currentTerm = response.term
@@ -290,5 +299,5 @@ class Context():
         for nodeID, node in enumerate(self.nodes):
             if node == [self.ip, self.port]:
                 continue
-            self.replicateLog(nodeID)        
+            self.replicateLog(nodeID, "set")        
     
