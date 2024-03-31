@@ -46,7 +46,8 @@ if __name__ == "__main__":
     # non-raft globals init
     nodes = loadNodes()
     ID = args.id
-    ip = getLocalIPAddress()
+    # ip = getLocalIPAddress()
+    ip = nodes[ID][0]
     port = nodes[ID][1]
     
     # logging setup
