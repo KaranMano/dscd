@@ -273,7 +273,7 @@ class Context():
                 self.hasLeaderLease = False
                 logger.info(f"[LEASE] Will wait for {self.leaseWait['max']} which will end at {self.leaseWait['end']} before acquiring lease")
                 for nodeID, node in enumerate(self.nodes):
-                    if node == [self.ip, self.port]:
+                    if nodeID == self.ID:
                         continue
                     self.sentLength[nodeID] = len(self.log)
                     self.ackedLength[nodeID] = 0
@@ -301,7 +301,7 @@ class Context():
         self.log.appendAt(f"SET {key} {value}", self.currentTerm, len(self.log))
         self.ackedLength[self.ID] = len(self.log)
         for nodeID, node in enumerate(self.nodes):
-            if node == [self.ip, self.port]:
+            if nodeID == self.ID:
                 continue
             self.replicateLog(nodeID, "set")        
     
