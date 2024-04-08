@@ -39,6 +39,7 @@ class Context():
 
         # non peristent metadata
         self.hasLeaderLease = False
+        self.lostLease = 0
         self.leaseWait = {"end": 0, "max": 0}
         self.currentRole = NodeStates.FOLLOWER
         self.currentLeader = None
@@ -81,10 +82,10 @@ class Context():
 
         self.electionTimer = TimedCallback(ELECTION_INTERVAL, self._startElection, None)
         self.heartbeatTimer = TimedCallback(HEARTBEAT_INTERVAL, self._heartbeat, None)
-        # self.leaseTimer = TimedCallback(LEASE_INTERVAL, self._acquireLease, None)
+        self.leaseTimer = TimedCallback(LEASE_INTERVAL, self._acquireLease, None)
         self.electionTimer.reset()
         self.heartbeatTimer.reset()
-        # self.leaseTimer.reset()
+        self.leaseTimer.reset()
         
         self._initialized = True
 
@@ -133,16 +134,18 @@ class Context():
                     logger.info(f"[LEASE] : Acquired lease for term {self.currentTerm}.")
                     self.hasLeaderLease = True
                     self.log.appendAt(f"NO-OP {self.currentTerm}", self.currentTerm, len(self.log))
+                self.lostLease = 0
             else:
-                logger.info(f"[LEASE] : Leader {self.ID} lease renewal failed, stepping down.")
-                self.hasLeaderLease = False
+                self.lostLease += 1
+                if self.lostLease == 3:
+                    logger.info(f"[LEASE] : Leader {self.ID} lease renewal failed, stepping down.")
+                    self.hasLeaderLease = False
         elif self.currentRole != NodeStates.LEADER and self.hasLeaderLease:
             logger.info(f"[LEASE] : Leader {self.ID} lease renewal failed, stepping down.")
             self.hasLeaderLease = False
-        # self.leaseTimer.reset()
+        self.leaseTimer.reset()
 
     def _heartbeat(self):
-        self._acquireLease()
         if self.currentRole == NodeStates.LEADER:
             logger.info(f"[HEARTBEAT] : Leader {self.ID} sending heartbeat & Renewing Lease")
             self.heartBeatsAcked = [False for _ in range(len(self.nodes))]
