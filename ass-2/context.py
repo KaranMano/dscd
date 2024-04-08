@@ -83,11 +83,12 @@ class Context():
         self.electionTimer = TimedCallback(ELECTION_INTERVAL, self._startElection, None)
         self.heartbeatTimer = TimedCallback(HEARTBEAT_INTERVAL, self._heartbeat, None)
         self.leaseTimer = TimedCallback(LEASE_INTERVAL, self._acquireLease, None)
+        self._initialized = True
+
+    def start(self):
         self.electionTimer.reset()
         self.heartbeatTimer.reset()
         self.leaseTimer.reset()
-        
-        self._initialized = True
 
     def __setattr__(self, name, value):
         if "_initialized" in self.__dict__ and self._initialized:
@@ -109,19 +110,22 @@ class Context():
                 numberOfAcks += 1
         return numberOfAcks
     
-    async def rpcWrapper(self, call, request):
+    async def rpcWrapper(self, addr, call, request):
         try:
             return await call(request)
+        except grpc.aio.AioRpcError as e:
+            await self.channels[addr]["channel"].close()
+            del self.channels[addr]
+            raise e
         except BaseException:
             raise
 
-    def getChannel(self, addr):
-        channel = None
-        if  addr in self.channels:
-            channel  = self.channels[addr]
-        else:
-            channel = self.channels[addr] = grpc.aio.insecure_channel(addr)
-        return channel
+    def getStub(self, addr, reconstruct):
+        if  reconstruct or addr not in self.channels:
+            self.channels[addr] = {}
+            self.channels[addr]["channel"] = grpc.aio.insecure_channel(addr)
+            self.channels[addr]["stub"] = node_pb2_grpc.NodeStub(self.channels[addr]["channel"])
+        return self.channels[addr]["stub"]
 
     # timer callbacks
     def _acquireLease(self):
@@ -170,9 +174,9 @@ class Context():
         for nodeID, node in enumerate(self.nodes):
             if nodeID == self.ID:
                 continue
-            channel = self.getChannel(f"{node[0]}:{node[1]}")
-            stub = node_pb2_grpc.NodeStub(channel)
-            self.tasks.append(asyncio.create_task(self.rpcWrapper(stub.RequestVote, request)))
+            addr = f"{node[0]}:{node[1]}"
+            stub = self.getStub(addr, False)
+            self.tasks.append(asyncio.create_task(self.rpcWrapper(addr, stub.RequestVote, request)))
             self.tasks[-1].add_done_callback(self.collectVote)
             self.tasksMetadata.append(nodeID)
         self.electionTimer.reset()
@@ -213,14 +217,13 @@ class Context():
         prefixTerm = 0
         if prefixLen > 0:
             prefixTerm = self.log[prefixLen - 1]["term"]
-        
-        channel = self.getChannel(f"{self.nodes[followerID][0]}:{self.nodes[followerID][1]}")
-        stub = node_pb2_grpc.NodeStub(channel)
+        addr = f"{self.nodes[followerID][0]}:{self.nodes[followerID][1]}"
+        stub = self.getStub(addr, False)
         entries = [node_pb2.Entry(msg=entry["msg"], term=entry["term"]) for entry in suffix]
         request = node_pb2.AppendRequest(
             term=self.currentTerm, leaderID=self.ID, prevLogIndex=prefixLen, prevLogTerm=prefixTerm, entries=entries, leaderCommitIndex=self.commitLength
         )
-        self.tasks.append(asyncio.create_task(self.rpcWrapper(stub.AppendEntries, request), name=name))
+        self.tasks.append(asyncio.create_task(self.rpcWrapper(addr, stub.AppendEntries, request), name=name))
         self.tasks[-1].add_done_callback(self.processLogResponse)
         self.tasksMetadata.append(followerID)
 
@@ -247,9 +250,9 @@ class Context():
                 self.electionTimer.reset()
         except grpc.aio.AioRpcError as e:
             logger.info(f"[LOG] : Error occurred while sending RPC to Node {followerID}. {e.__class__.__name__}")
-            # logger.info(traceback.format_exc())
         except BaseException as e:
             logger.info(f"Error occurred while appending entries, {e.__class__.__name__}")
+            logger.info(f"{e}")
         finally:
             self.tasksMetadata = self.tasksMetadata[:taskIndex] + self.tasksMetadata[taskIndex+1:]
             self.tasks.remove(task)
@@ -293,7 +296,6 @@ class Context():
             logger.info(f"[ELECTION] : Error occurred while sending RPC to Node {followerID}. {e.__class__.__name__}")
         except BaseException as e:
             logger.info(f"Error occurred while collecting vote. {e.__class__.__name__}")
-            # logger.info(traceback.format_exc())
         finally:
             self.tasksMetadata = self.tasksMetadata[:taskIndex] + self.tasksMetadata[taskIndex+1:]
             self.tasks.remove(task)

@@ -33,6 +33,7 @@ async def startRaft(ID, ip, port ,nodes):
     server.add_insecure_port(listen_addr)
     logging.info(f"Starting server on {listen_addr}")
     await server.start()
+    state.start()
     await server.wait_for_termination()
 
 if __name__ == "__main__":
