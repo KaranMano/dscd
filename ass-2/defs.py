@@ -154,7 +154,7 @@ class NodeServicer(node_pb2_grpc.ClientServicer):
             self.state.electionTimer.reset()
         logOk = (len(self.state.log) >= request.prevLogIndex) and (request.prevLogIndex == 0 or self.state.log[request.prevLogIndex - 1]["term"] == request.prevLogTerm)
         if request.term == self.state.currentTerm and logOk:
-            self.state.leaseTimer.reset()
+            # self.state.leaseTimer.reset()
             self.state.heartbeatTimer.reset()
             self.state.electionTimer.reset()
             self.state.appendEntries(request.prevLogIndex, request.leaderCommitIndex, [{"msg": entry.msg, "term": entry.term} for entry in request.entries])
@@ -179,7 +179,7 @@ class NodeServicer(node_pb2_grpc.ClientServicer):
         logOk = (request.lastLogTerm > lastTerm) or (request.lastLogTerm == lastTerm and request.lastLogIndex >= len(self.state.log))
         if request.term == self.state.currentTerm and logOk and self.state.votedFor in [request.candidateId, None]:
             logger.info(f"[ELECTION] : Vote granted for Node {request.candidateId} in term {request.term}")
-            self.state.leaseTimer.reset()
+            # self.state.leaseTimer.reset()
             self.state.heartbeatTimer.reset()
             self.state.votedFor = request.candidateId
             return node_pb2.VoteResponse(resID=self.state.ID ,term=self.state.currentTerm, voteGranted=True, leaseLeft=self.state.heartbeatTimer.getTimeLeft())
