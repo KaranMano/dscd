@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+service Master {
+  rpc InvokeMapper (MapperParameters) returns (MapperResponse) {}
+  rpc InvokeReducer (ReducerParameters) returns (ReducerResponse) {}
+}
+
+service Reducer {
+  rpc RequestInput (ReducerInputRequest) returns (ReducerInputResponse) {}
+}
