@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-service Master {
+service Mapper {
   rpc InvokeMapper (MapperParameters) returns (MapperResponse) {}
-  rpc InvokeReducer (ReducerParameters) returns (ReducerResponse) {}
+  rpc GetPartitions (GetPartitionsParameters) returns (GetPartitionsResponse) {}
 }
 message Centroid {
   int32 id = 1;
@@ -14,10 +14,29 @@ message MapperParameters {
   int32 range_start = 2;
   int32 range_end = 3;
   repeated Centroid centroids = 4;
+  int32 mapper_id = 5;
 }
 message MapperResponse {
   int32 id = 1;
   string status = 2;
+}
+message GetPartitionsParameters {
+  int32 reducer_id = 1;
+}
+message PartitionEntry {
+  int32 key = 1;
+  int32 point_id = 2;
+  float x = 3;
+  float y = 4;
+}
+message GetPartitionsResponse {
+  int32 mapper_id = 1;
+  string status = 2;
+  repeated PartitionEntry partition = 3;
+}
+
+service Reducer {
+  rpc InvokeReducer (ReducerParameters) returns (ReducerResponse) {}
 }
 message ReducerParameters {
   int32 n_mappers = 1;
@@ -32,22 +51,4 @@ message ReducerResponse {
   int32 id = 1;
   string status = 2;
   repeated ReducerOutputEntry entries = 3;
-}
-
-service Reducer {
-  rpc RequestInput (ReducerInputRequest) returns (ReducerInputResponse) {}
-}
-message ReducerInputRequest {
-  int32 reducer_id = 1;
-}
-message PartitionEntry {
-  int32 key = 1;
-  int32 point_id = 2;
-  float x = 3;
-  float y = 4;
-}
-message ReducerInputResponse {
-  int32 mapper_id = 1;
-  string status = 2;
-  repeated PartitionEntry partition = 3;
 }

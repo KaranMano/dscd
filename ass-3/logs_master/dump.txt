@@ -1,1 +1,615 @@
-[05:40:23 PM] : Initialized node: master
+[03:45:45 AM] : Initialized node: master
+[03:45:45 AM] : pts [[0, 0.4, 7.2], [1, 0.8, 9.8], [2, -1.5, 7.3], [3, 8.1, 3.4], [4, 7.3, 2.3], [5, 9.1, 3.1], [6, 8.9, 0.2], [7, 11.5, -1.9], [8, 10.2, 0.5], [9, 9.8, 1.2], [10, 8.5, 2.7], [11, 10.3, -0.3], [12, 9.7, 0.8], [13, 8.3, 2.9], [14, 0.0, 7.1], [15, 0.9, 9.6], [16, -1.6, 7.4], [17, 0.3, 7.2], [18, 0.7, 9.9], [19, -1.7, 7.5], [20, 0.5, 7.4], [21, 0.9, 9.7], [22, -1.8, 7.6], [23, 11.1, -1.5], [24, 10.8, -0.6], [25, 9.5, 1.5], [26, 8.7, 2.4], [27, 11.2, -1.2], [28, 10.5, -0.1], [29, 9.3, 1.9], [30, 8.6, 2.6]]
+[03:45:45 AM] : split ranges [[0, 10], [11, 20], [21, 30]]
+[03:45:45 AM] : centroids [[29, 9.3, 1.9], [17, 0.3, 7.2], [18, 0.7, 9.9], [15, 0.9, 9.6], [27, 11.2, -1.2], [2, -1.5, 7.3]]
+[03:45:46 AM] : [ITER] executing iteration 0 ...
+[03:45:46 AM] : received response from mapper status: "OK"
+
+[03:45:46 AM] : received response from mapper id: 1
+status: "OK"
+
+[03:45:46 AM] : received response from mapper id: 2
+status: "OK"
+
+[03:45:46 AM] : waiting for all mappers to finish ...
+[03:45:46 AM] : [MAPPER RES] mapper responses joined {0: status: "OK"
+, 1: id: 1
+status: "OK"
+, 2: id: 2
+status: "OK"
+}
+[03:45:46 AM] : received response from reducer id: 1
+status: "OK"
+entries {
+  current_centroid_id: 1
+  updated_centroid_x: -0.65
+  updated_centroid_y: 7.3
+}
+
+[03:45:46 AM] : received response from reducer status: "OK"
+entries {
+  updated_centroid_x: 8.95000076
+  updated_centroid_y: 2.25
+}
+entries {
+  current_centroid_id: 5
+  updated_centroid_x: 4.72857141
+  updated_centroid_y: 4.75714302
+}
+
+[03:45:46 AM] : received response from reducer id: 4
+status: "OK"
+entries {
+  current_centroid_id: 4
+  updated_centroid_x: 10.3
+  updated_centroid_y: 0.0833333358
+}
+
+[03:45:46 AM] : received response from reducer id: 2
+status: "OK"
+entries {
+  current_centroid_id: 2
+  updated_centroid_x: -0.28
+  updated_centroid_y: 8.42
+}
+
+[03:45:46 AM] : received response from reducer id: 3
+status: "OK"
+entries {
+  current_centroid_id: 3
+  updated_centroid_x: 7.68888903
+  updated_centroid_y: 2.51111126
+}
+
+[03:45:46 AM] : waiting for all reducers to finish ...
+[03:45:46 AM] : [REDUCER RES] reducer responses joined [[1, -0.6499999761581421, 7.300000190734863], [0, 8.950000762939453, 2.25], [5, 4.72857141494751, 4.757143020629883], [4, 10.300000190734863, 0.0833333358168602], [2, -0.2800000011920929, 8.420000076293945], [3, 7.688889026641846, 2.511111259460449]]
+[03:45:46 AM] : [ITER] executing iteration 1 ...
+[03:45:46 AM] : received response from mapper status: "OK"
+
+[03:45:46 AM] : received response from mapper id: 1
+status: "OK"
+
+[03:45:46 AM] : received response from mapper id: 2
+status: "OK"
+
+[03:45:46 AM] : waiting for all mappers to finish ...
+[03:45:46 AM] : [MAPPER RES] mapper responses joined {0: status: "OK"
+, 1: id: 1
+status: "OK"
+, 2: id: 2
+status: "OK"
+}
+[03:45:46 AM] : received response from reducer status: "OK"
+entries {
+  current_centroid_id: 5
+  updated_centroid_x: 4.72857141
+  updated_centroid_y: 4.75714302
+}
+entries {
+  updated_centroid_x: 8.95000076
+  updated_centroid_y: 2.25
+}
+
+[03:45:46 AM] : received response from reducer id: 1
+status: "OK"
+entries {
+  current_centroid_id: 1
+  updated_centroid_x: -0.65
+  updated_centroid_y: 7.3
+}
+
+[03:45:46 AM] : received response from reducer id: 2
+status: "OK"
+entries {
+  current_centroid_id: 2
+  updated_centroid_x: -0.28
+  updated_centroid_y: 8.42
+}
+
+[03:45:46 AM] : received response from reducer id: 3
+status: "OK"
+entries {
+  current_centroid_id: 3
+  updated_centroid_x: 7.68888903
+  updated_centroid_y: 2.51111126
+}
+
+[03:45:46 AM] : received response from reducer id: 4
+status: "OK"
+entries {
+  current_centroid_id: 4
+  updated_centroid_x: 10.3
+  updated_centroid_y: 0.0833333358
+}
+
+[03:45:46 AM] : waiting for all reducers to finish ...
+[03:45:46 AM] : [REDUCER RES] reducer responses joined [[5, 4.72857141494751, 4.757143020629883], [0, 8.950000762939453, 2.25], [1, -0.6499999761581421, 7.300000190734863], [2, -0.2800000011920929, 8.420000076293945], [3, 7.688889026641846, 2.511111259460449], [4, 10.300000190734863, 0.0833333358168602]]
+[03:45:46 AM] : [ITER] executing iteration 2 ...
+[03:45:46 AM] : received response from mapper status: "OK"
+
+[03:45:46 AM] : received response from mapper id: 2
+status: "OK"
+
+[03:45:46 AM] : received response from mapper id: 1
+status: "OK"
+
+[03:45:46 AM] : waiting for all mappers to finish ...
+[03:45:46 AM] : [MAPPER RES] mapper responses joined {0: status: "OK"
+, 2: id: 2
+status: "OK"
+, 1: id: 1
+status: "OK"
+}
+[03:45:46 AM] : received response from reducer id: 1
+status: "OK"
+entries {
+  current_centroid_id: 1
+  updated_centroid_x: -0.65
+  updated_centroid_y: 7.3
+}
+
+[03:45:46 AM] : received response from reducer status: "OK"
+entries {
+  current_centroid_id: 5
+  updated_centroid_x: 4.72857141
+  updated_centroid_y: 4.75714302
+}
+entries {
+  updated_centroid_x: 8.95000076
+  updated_centroid_y: 2.25
+}
+
+[03:45:46 AM] : received response from reducer id: 2
+status: "OK"
+entries {
+  current_centroid_id: 2
+  updated_centroid_x: -0.28
+  updated_centroid_y: 8.42
+}
+
+[03:45:46 AM] : received response from reducer id: 3
+status: "OK"
+entries {
+  current_centroid_id: 3
+  updated_centroid_x: 7.68888903
+  updated_centroid_y: 2.51111126
+}
+
+[03:45:46 AM] : received response from reducer id: 4
+status: "OK"
+entries {
+  current_centroid_id: 4
+  updated_centroid_x: 10.3
+  updated_centroid_y: 0.0833333358
+}
+
+[03:45:46 AM] : waiting for all reducers to finish ...
+[03:45:46 AM] : [REDUCER RES] reducer responses joined [[1, -0.6499999761581421, 7.300000190734863], [5, 4.72857141494751, 4.757143020629883], [0, 8.950000762939453, 2.25], [2, -0.2800000011920929, 8.420000076293945], [3, 7.688889026641846, 2.511111259460449], [4, 10.300000190734863, 0.0833333358168602]]
+[03:45:46 AM] : [ITER] executing iteration 3 ...
+[03:45:46 AM] : received response from mapper status: "OK"
+
+[03:45:46 AM] : received response from mapper id: 1
+status: "OK"
+
+[03:45:46 AM] : received response from mapper id: 2
+status: "OK"
+
+[03:45:46 AM] : waiting for all mappers to finish ...
+[03:45:46 AM] : [MAPPER RES] mapper responses joined {0: status: "OK"
+, 1: id: 1
+status: "OK"
+, 2: id: 2
+status: "OK"
+}
+[03:45:46 AM] : received response from reducer status: "OK"
+entries {
+  current_centroid_id: 5
+  updated_centroid_x: 4.72857141
+  updated_centroid_y: 4.75714302
+}
+entries {
+  updated_centroid_x: 8.95000076
+  updated_centroid_y: 2.25
+}
+
+[03:45:46 AM] : received response from reducer id: 1
+status: "OK"
+entries {
+  current_centroid_id: 1
+  updated_centroid_x: -0.65
+  updated_centroid_y: 7.3
+}
+
+[03:45:46 AM] : received response from reducer id: 4
+status: "OK"
+entries {
+  current_centroid_id: 4
+  updated_centroid_x: 10.3
+  updated_centroid_y: 0.0833333358
+}
+
+[03:45:46 AM] : received response from reducer id: 2
+status: "OK"
+entries {
+  current_centroid_id: 2
+  updated_centroid_x: -0.28
+  updated_centroid_y: 8.42
+}
+
+[03:45:46 AM] : received response from reducer id: 3
+status: "OK"
+entries {
+  current_centroid_id: 3
+  updated_centroid_x: 7.68888903
+  updated_centroid_y: 2.51111126
+}
+
+[03:45:46 AM] : waiting for all reducers to finish ...
+[03:45:46 AM] : [REDUCER RES] reducer responses joined [[5, 4.72857141494751, 4.757143020629883], [0, 8.950000762939453, 2.25], [1, -0.6499999761581421, 7.300000190734863], [4, 10.300000190734863, 0.0833333358168602], [2, -0.2800000011920929, 8.420000076293945], [3, 7.688889026641846, 2.511111259460449]]
+[03:45:46 AM] : [ITER] executing iteration 4 ...
+[03:45:46 AM] : received response from mapper status: "OK"
+
+[03:45:46 AM] : received response from mapper id: 1
+status: "OK"
+
+[03:45:46 AM] : received response from mapper id: 2
+status: "OK"
+
+[03:45:46 AM] : waiting for all mappers to finish ...
+[03:45:46 AM] : [MAPPER RES] mapper responses joined {0: status: "OK"
+, 1: id: 1
+status: "OK"
+, 2: id: 2
+status: "OK"
+}
+[03:45:46 AM] : received response from reducer status: "OK"
+entries {
+  current_centroid_id: 5
+  updated_centroid_x: 4.72857141
+  updated_centroid_y: 4.75714302
+}
+entries {
+  updated_centroid_x: 8.95000076
+  updated_centroid_y: 2.25
+}
+
+[03:45:46 AM] : received response from reducer id: 1
+status: "OK"
+entries {
+  current_centroid_id: 1
+  updated_centroid_x: -0.65
+  updated_centroid_y: 7.3
+}
+
+[03:45:46 AM] : received response from reducer id: 3
+status: "OK"
+entries {
+  current_centroid_id: 3
+  updated_centroid_x: 7.68888903
+  updated_centroid_y: 2.51111126
+}
+
+[03:45:46 AM] : received response from reducer id: 2
+status: "OK"
+entries {
+  current_centroid_id: 2
+  updated_centroid_x: -0.28
+  updated_centroid_y: 8.42
+}
+
+[03:45:46 AM] : received response from reducer id: 4
+status: "OK"
+entries {
+  current_centroid_id: 4
+  updated_centroid_x: 10.3
+  updated_centroid_y: 0.0833333358
+}
+
+[03:45:47 AM] : waiting for all reducers to finish ...
+[03:45:47 AM] : [REDUCER RES] reducer responses joined [[5, 4.72857141494751, 4.757143020629883], [0, 8.950000762939453, 2.25], [1, -0.6499999761581421, 7.300000190734863], [3, 7.688889026641846, 2.511111259460449], [2, -0.2800000011920929, 8.420000076293945], [4, 10.300000190734863, 0.0833333358168602]]
+[03:45:47 AM] : [ITER] executing iteration 5 ...
+[03:45:47 AM] : received response from mapper status: "OK"
+
+[03:45:47 AM] : received response from mapper id: 1
+status: "OK"
+
+[03:45:47 AM] : received response from mapper id: 2
+status: "OK"
+
+[03:45:47 AM] : waiting for all mappers to finish ...
+[03:45:47 AM] : [MAPPER RES] mapper responses joined {0: status: "OK"
+, 1: id: 1
+status: "OK"
+, 2: id: 2
+status: "OK"
+}
+[03:45:47 AM] : received response from reducer status: "OK"
+entries {
+  current_centroid_id: 5
+  updated_centroid_x: 4.72857141
+  updated_centroid_y: 4.75714302
+}
+entries {
+  updated_centroid_x: 8.95000076
+  updated_centroid_y: 2.25
+}
+
+[03:45:47 AM] : received response from reducer id: 1
+status: "OK"
+entries {
+  current_centroid_id: 1
+  updated_centroid_x: -0.65
+  updated_centroid_y: 7.3
+}
+
+[03:45:47 AM] : received response from reducer id: 3
+status: "OK"
+entries {
+  current_centroid_id: 3
+  updated_centroid_x: 7.68888903
+  updated_centroid_y: 2.51111126
+}
+
+[03:45:47 AM] : received response from reducer id: 2
+status: "OK"
+entries {
+  current_centroid_id: 2
+  updated_centroid_x: -0.28
+  updated_centroid_y: 8.42
+}
+
+[03:45:47 AM] : received response from reducer id: 4
+status: "OK"
+entries {
+  current_centroid_id: 4
+  updated_centroid_x: 10.3
+  updated_centroid_y: 0.0833333358
+}
+
+[03:45:47 AM] : waiting for all reducers to finish ...
+[03:45:47 AM] : [REDUCER RES] reducer responses joined [[5, 4.72857141494751, 4.757143020629883], [0, 8.950000762939453, 2.25], [1, -0.6499999761581421, 7.300000190734863], [3, 7.688889026641846, 2.511111259460449], [2, -0.2800000011920929, 8.420000076293945], [4, 10.300000190734863, 0.0833333358168602]]
+[03:45:47 AM] : [ITER] executing iteration 6 ...
+[03:45:47 AM] : received response from mapper status: "OK"
+
+[03:45:47 AM] : received response from mapper id: 1
+status: "OK"
+
+[03:45:47 AM] : received response from mapper id: 2
+status: "OK"
+
+[03:45:47 AM] : waiting for all mappers to finish ...
+[03:45:47 AM] : [MAPPER RES] mapper responses joined {0: status: "OK"
+, 1: id: 1
+status: "OK"
+, 2: id: 2
+status: "OK"
+}
+[03:45:47 AM] : received response from reducer status: "OK"
+entries {
+  current_centroid_id: 5
+  updated_centroid_x: 4.72857141
+  updated_centroid_y: 4.75714302
+}
+entries {
+  updated_centroid_x: 8.95000076
+  updated_centroid_y: 2.25
+}
+
+[03:45:47 AM] : received response from reducer id: 1
+status: "OK"
+entries {
+  current_centroid_id: 1
+  updated_centroid_x: -0.65
+  updated_centroid_y: 7.3
+}
+
+[03:45:47 AM] : received response from reducer id: 2
+status: "OK"
+entries {
+  current_centroid_id: 2
+  updated_centroid_x: -0.28
+  updated_centroid_y: 8.42
+}
+
+[03:45:47 AM] : received response from reducer id: 3
+status: "OK"
+entries {
+  current_centroid_id: 3
+  updated_centroid_x: 7.68888903
+  updated_centroid_y: 2.51111126
+}
+
+[03:45:47 AM] : received response from reducer id: 4
+status: "OK"
+entries {
+  current_centroid_id: 4
+  updated_centroid_x: 10.3
+  updated_centroid_y: 0.0833333358
+}
+
+[03:45:47 AM] : waiting for all reducers to finish ...
+[03:45:47 AM] : [REDUCER RES] reducer responses joined [[5, 4.72857141494751, 4.757143020629883], [0, 8.950000762939453, 2.25], [1, -0.6499999761581421, 7.300000190734863], [2, -0.2800000011920929, 8.420000076293945], [3, 7.688889026641846, 2.511111259460449], [4, 10.300000190734863, 0.0833333358168602]]
+[03:45:47 AM] : [ITER] executing iteration 7 ...
+[03:45:47 AM] : received response from mapper status: "OK"
+
+[03:45:47 AM] : received response from mapper id: 1
+status: "OK"
+
+[03:45:47 AM] : received response from mapper id: 2
+status: "OK"
+
+[03:45:47 AM] : waiting for all mappers to finish ...
+[03:45:47 AM] : [MAPPER RES] mapper responses joined {0: status: "OK"
+, 1: id: 1
+status: "OK"
+, 2: id: 2
+status: "OK"
+}
+[03:45:47 AM] : received response from reducer status: "OK"
+entries {
+  current_centroid_id: 5
+  updated_centroid_x: 4.72857141
+  updated_centroid_y: 4.75714302
+}
+entries {
+  updated_centroid_x: 8.95000076
+  updated_centroid_y: 2.25
+}
+
+[03:45:47 AM] : received response from reducer id: 1
+status: "OK"
+entries {
+  current_centroid_id: 1
+  updated_centroid_x: -0.65
+  updated_centroid_y: 7.3
+}
+
+[03:45:47 AM] : received response from reducer id: 2
+status: "OK"
+entries {
+  current_centroid_id: 2
+  updated_centroid_x: -0.28
+  updated_centroid_y: 8.42
+}
+
+[03:45:47 AM] : received response from reducer id: 3
+status: "OK"
+entries {
+  current_centroid_id: 3
+  updated_centroid_x: 7.68888903
+  updated_centroid_y: 2.51111126
+}
+
+[03:45:47 AM] : received response from reducer id: 4
+status: "OK"
+entries {
+  current_centroid_id: 4
+  updated_centroid_x: 10.3
+  updated_centroid_y: 0.0833333358
+}
+
+[03:45:47 AM] : waiting for all reducers to finish ...
+[03:45:47 AM] : [REDUCER RES] reducer responses joined [[5, 4.72857141494751, 4.757143020629883], [0, 8.950000762939453, 2.25], [1, -0.6499999761581421, 7.300000190734863], [2, -0.2800000011920929, 8.420000076293945], [3, 7.688889026641846, 2.511111259460449], [4, 10.300000190734863, 0.0833333358168602]]
+[03:45:47 AM] : [ITER] executing iteration 8 ...
+[03:45:47 AM] : received response from mapper status: "OK"
+
+[03:45:47 AM] : received response from mapper id: 1
+status: "OK"
+
+[03:45:47 AM] : received response from mapper id: 2
+status: "OK"
+
+[03:45:47 AM] : waiting for all mappers to finish ...
+[03:45:47 AM] : [MAPPER RES] mapper responses joined {0: status: "OK"
+, 1: id: 1
+status: "OK"
+, 2: id: 2
+status: "OK"
+}
+[03:45:47 AM] : received response from reducer status: "OK"
+entries {
+  current_centroid_id: 5
+  updated_centroid_x: 4.72857141
+  updated_centroid_y: 4.75714302
+}
+entries {
+  updated_centroid_x: 8.95000076
+  updated_centroid_y: 2.25
+}
+
+[03:45:47 AM] : received response from reducer id: 1
+status: "OK"
+entries {
+  current_centroid_id: 1
+  updated_centroid_x: -0.65
+  updated_centroid_y: 7.3
+}
+
+[03:45:47 AM] : received response from reducer id: 3
+status: "OK"
+entries {
+  current_centroid_id: 3
+  updated_centroid_x: 7.68888903
+  updated_centroid_y: 2.51111126
+}
+
+[03:45:47 AM] : received response from reducer id: 2
+status: "OK"
+entries {
+  current_centroid_id: 2
+  updated_centroid_x: -0.28
+  updated_centroid_y: 8.42
+}
+
+[03:45:47 AM] : received response from reducer id: 4
+status: "OK"
+entries {
+  current_centroid_id: 4
+  updated_centroid_x: 10.3
+  updated_centroid_y: 0.0833333358
+}
+
+[03:45:47 AM] : waiting for all reducers to finish ...
+[03:45:47 AM] : [REDUCER RES] reducer responses joined [[5, 4.72857141494751, 4.757143020629883], [0, 8.950000762939453, 2.25], [1, -0.6499999761581421, 7.300000190734863], [3, 7.688889026641846, 2.511111259460449], [2, -0.2800000011920929, 8.420000076293945], [4, 10.300000190734863, 0.0833333358168602]]
+[03:45:47 AM] : [ITER] executing iteration 9 ...
+[03:45:47 AM] : received response from mapper status: "OK"
+
+[03:45:47 AM] : received response from mapper id: 1
+status: "OK"
+
+[03:45:47 AM] : received response from mapper id: 2
+status: "OK"
+
+[03:45:47 AM] : waiting for all mappers to finish ...
+[03:45:47 AM] : [MAPPER RES] mapper responses joined {0: status: "OK"
+, 1: id: 1
+status: "OK"
+, 2: id: 2
+status: "OK"
+}
+[03:45:47 AM] : received response from reducer status: "OK"
+entries {
+  updated_centroid_x: 8.95000076
+  updated_centroid_y: 2.25
+}
+entries {
+  current_centroid_id: 5
+  updated_centroid_x: 4.72857141
+  updated_centroid_y: 4.75714302
+}
+
+[03:45:47 AM] : received response from reducer id: 1
+status: "OK"
+entries {
+  current_centroid_id: 1
+  updated_centroid_x: -0.65
+  updated_centroid_y: 7.3
+}
+
+[03:45:47 AM] : received response from reducer id: 2
+status: "OK"
+entries {
+  current_centroid_id: 2
+  updated_centroid_x: -0.28
+  updated_centroid_y: 8.42
+}
+
+[03:45:47 AM] : received response from reducer id: 3
+status: "OK"
+entries {
+  current_centroid_id: 3
+  updated_centroid_x: 7.68888903
+  updated_centroid_y: 2.51111126
+}
+
+[03:45:47 AM] : received response from reducer id: 4
+status: "OK"
+entries {
+  current_centroid_id: 4
+  updated_centroid_x: 10.3
+  updated_centroid_y: 0.0833333358
+}
+
+[03:45:47 AM] : waiting for all reducers to finish ...
+[03:45:47 AM] : [REDUCER RES] reducer responses joined [[0, 8.950000762939453, 2.25], [5, 4.72857141494751, 4.757143020629883], [1, -0.6499999761581421, 7.300000190734863], [2, -0.2800000011920929, 8.420000076293945], [3, 7.688889026641846, 2.511111259460449], [4, 10.300000190734863, 0.0833333358168602]]
+[03:45:47 AM] : saving final centroids: [[0, 8.950000762939453, 2.25], [5, 4.72857141494751, 4.757143020629883], [1, -0.6499999761581421, 7.300000190734863], [2, -0.2800000011920929, 8.420000076293945], [3, 7.688889026641846, 2.511111259460449], [4, 10.300000190734863, 0.0833333358168602]]

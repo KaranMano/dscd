@@ -1,0 +1,1283 @@
+[03:45:46 AM] : Initialized node: reducer
+[03:45:46 AM] : reducer-0 invoked! PID=20892 parentPID=16088
+[03:45:46 AM] : PORT: 10000
+[03:45:46 AM] : n_mappers: 3
+centroids {
+  id: 29
+  x: 9.3
+  y: 1.9
+}
+centroids {
+  id: 17
+  x: 0.3
+  y: 7.2
+}
+centroids {
+  id: 18
+  x: 0.7
+  y: 9.9
+}
+centroids {
+  id: 15
+  x: 0.9
+  y: 9.6
+}
+centroids {
+  id: 27
+  x: 11.2
+  y: -1.2
+}
+centroids {
+  id: 2
+  x: -1.5
+  y: 7.3
+}
+
+[03:45:46 AM] : mapper_id: 1
+status: "OK"
+
+[03:45:46 AM] : mapper_id: 2
+status: "OK"
+partition {
+  point_id: 29
+  x: 9.3
+  y: 1.9
+}
+partition {
+  point_id: 30
+  x: 8.6
+  y: 2.6
+}
+
+[03:45:46 AM] : status: "OK"
+partition {
+  key: 5
+  x: 0.4
+  y: 7.2
+}
+partition {
+  key: 5
+  point_id: 1
+  x: 0.8
+  y: 9.8
+}
+partition {
+  key: 5
+  point_id: 2
+  x: -1.5
+  y: 7.3
+}
+partition {
+  key: 5
+  point_id: 3
+  x: 8.1
+  y: 3.4
+}
+partition {
+  key: 5
+  point_id: 4
+  x: 7.3
+  y: 2.3
+}
+partition {
+  key: 5
+  point_id: 5
+  x: 9.1
+  y: 3.1
+}
+partition {
+  key: 5
+  point_id: 6
+  x: 8.9
+  y: 0.2
+}
+
+[03:45:46 AM] : [point_id: 29
+x: 9.3
+y: 1.9
+, point_id: 30
+x: 8.6
+y: 2.6
+, key: 5
+x: 0.4
+y: 7.2
+, key: 5
+point_id: 1
+x: 0.8
+y: 9.8
+, key: 5
+point_id: 2
+x: -1.5
+y: 7.3
+, key: 5
+point_id: 3
+x: 8.1
+y: 3.4
+, key: 5
+point_id: 4
+x: 7.3
+y: 2.3
+, key: 5
+point_id: 5
+x: 9.1
+y: 3.1
+, key: 5
+point_id: 6
+x: 8.9
+y: 0.2
+]
+[03:45:46 AM] : sorted partitions:
+[03:45:46 AM] : {0: [[29, 9.300000190734863, 1.899999976158142], [30, 8.600000381469727, 2.5999999046325684]], 5: [[0, 0.4000000059604645, 7.199999809265137], [1, 0.800000011920929, 9.800000190734863], [2, -1.5, 7.300000190734863], [3, 8.100000381469727, 3.4000000953674316], [4, 7.300000190734863, 2.299999952316284], [5, 9.100000381469727, 3.0999999046325684], [6, 8.899999618530273, 0.20000000298023224]]}
+[03:45:46 AM] : reducer output: [[0, 8.950000286102295, 2.2499999403953552], [5, 4.728571512869427, 4.757142878004482]]
+[03:45:46 AM] : n_mappers: 3
+centroids {
+  id: 29
+  x: 9.3
+  y: 1.9
+}
+centroids {
+  id: 17
+  x: 0.3
+  y: 7.2
+}
+centroids {
+  id: 18
+  x: 0.7
+  y: 9.9
+}
+centroids {
+  id: 15
+  x: 0.9
+  y: 9.6
+}
+centroids {
+  id: 27
+  x: 11.2
+  y: -1.2
+}
+centroids {
+  id: 2
+  x: -1.5
+  y: 7.3
+}
+
+[03:45:46 AM] : mapper_id: 1
+status: "OK"
+
+[03:45:46 AM] : status: "OK"
+partition {
+  key: 5
+  x: 0.4
+  y: 7.2
+}
+partition {
+  key: 5
+  point_id: 1
+  x: 0.8
+  y: 9.8
+}
+partition {
+  key: 5
+  point_id: 2
+  x: -1.5
+  y: 7.3
+}
+partition {
+  key: 5
+  point_id: 3
+  x: 8.1
+  y: 3.4
+}
+partition {
+  key: 5
+  point_id: 4
+  x: 7.3
+  y: 2.3
+}
+partition {
+  key: 5
+  point_id: 5
+  x: 9.1
+  y: 3.1
+}
+partition {
+  key: 5
+  point_id: 6
+  x: 8.9
+  y: 0.2
+}
+
+[03:45:46 AM] : mapper_id: 2
+status: "OK"
+partition {
+  point_id: 29
+  x: 9.3
+  y: 1.9
+}
+partition {
+  point_id: 30
+  x: 8.6
+  y: 2.6
+}
+
+[03:45:46 AM] : [key: 5
+x: 0.4
+y: 7.2
+, key: 5
+point_id: 1
+x: 0.8
+y: 9.8
+, key: 5
+point_id: 2
+x: -1.5
+y: 7.3
+, key: 5
+point_id: 3
+x: 8.1
+y: 3.4
+, key: 5
+point_id: 4
+x: 7.3
+y: 2.3
+, key: 5
+point_id: 5
+x: 9.1
+y: 3.1
+, key: 5
+point_id: 6
+x: 8.9
+y: 0.2
+, point_id: 29
+x: 9.3
+y: 1.9
+, point_id: 30
+x: 8.6
+y: 2.6
+]
+[03:45:46 AM] : sorted partitions:
+[03:45:46 AM] : {5: [[0, 0.4000000059604645, 7.199999809265137], [1, 0.800000011920929, 9.800000190734863], [2, -1.5, 7.300000190734863], [3, 8.100000381469727, 3.4000000953674316], [4, 7.300000190734863, 2.299999952316284], [5, 9.100000381469727, 3.0999999046325684], [6, 8.899999618530273, 0.20000000298023224]], 0: [[29, 9.300000190734863, 1.899999976158142], [30, 8.600000381469727, 2.5999999046325684]]}
+[03:45:46 AM] : reducer output: [[5, 4.728571512869427, 4.757142878004482], [0, 8.950000286102295, 2.2499999403953552]]
+[03:45:46 AM] : n_mappers: 3
+centroids {
+  id: 29
+  x: 9.3
+  y: 1.9
+}
+centroids {
+  id: 17
+  x: 0.3
+  y: 7.2
+}
+centroids {
+  id: 18
+  x: 0.7
+  y: 9.9
+}
+centroids {
+  id: 15
+  x: 0.9
+  y: 9.6
+}
+centroids {
+  id: 27
+  x: 11.2
+  y: -1.2
+}
+centroids {
+  id: 2
+  x: -1.5
+  y: 7.3
+}
+
+[03:45:46 AM] : mapper_id: 1
+status: "OK"
+
+[03:45:46 AM] : status: "OK"
+partition {
+  key: 5
+  x: 0.4
+  y: 7.2
+}
+partition {
+  key: 5
+  point_id: 1
+  x: 0.8
+  y: 9.8
+}
+partition {
+  key: 5
+  point_id: 2
+  x: -1.5
+  y: 7.3
+}
+partition {
+  key: 5
+  point_id: 3
+  x: 8.1
+  y: 3.4
+}
+partition {
+  key: 5
+  point_id: 4
+  x: 7.3
+  y: 2.3
+}
+partition {
+  key: 5
+  point_id: 5
+  x: 9.1
+  y: 3.1
+}
+partition {
+  key: 5
+  point_id: 6
+  x: 8.9
+  y: 0.2
+}
+
+[03:45:46 AM] : mapper_id: 2
+status: "OK"
+partition {
+  point_id: 29
+  x: 9.3
+  y: 1.9
+}
+partition {
+  point_id: 30
+  x: 8.6
+  y: 2.6
+}
+
+[03:45:46 AM] : [key: 5
+x: 0.4
+y: 7.2
+, key: 5
+point_id: 1
+x: 0.8
+y: 9.8
+, key: 5
+point_id: 2
+x: -1.5
+y: 7.3
+, key: 5
+point_id: 3
+x: 8.1
+y: 3.4
+, key: 5
+point_id: 4
+x: 7.3
+y: 2.3
+, key: 5
+point_id: 5
+x: 9.1
+y: 3.1
+, key: 5
+point_id: 6
+x: 8.9
+y: 0.2
+, point_id: 29
+x: 9.3
+y: 1.9
+, point_id: 30
+x: 8.6
+y: 2.6
+]
+[03:45:46 AM] : sorted partitions:
+[03:45:46 AM] : {5: [[0, 0.4000000059604645, 7.199999809265137], [1, 0.800000011920929, 9.800000190734863], [2, -1.5, 7.300000190734863], [3, 8.100000381469727, 3.4000000953674316], [4, 7.300000190734863, 2.299999952316284], [5, 9.100000381469727, 3.0999999046325684], [6, 8.899999618530273, 0.20000000298023224]], 0: [[29, 9.300000190734863, 1.899999976158142], [30, 8.600000381469727, 2.5999999046325684]]}
+[03:45:46 AM] : reducer output: [[5, 4.728571512869427, 4.757142878004482], [0, 8.950000286102295, 2.2499999403953552]]
+[03:45:46 AM] : n_mappers: 3
+centroids {
+  id: 29
+  x: 9.3
+  y: 1.9
+}
+centroids {
+  id: 17
+  x: 0.3
+  y: 7.2
+}
+centroids {
+  id: 18
+  x: 0.7
+  y: 9.9
+}
+centroids {
+  id: 15
+  x: 0.9
+  y: 9.6
+}
+centroids {
+  id: 27
+  x: 11.2
+  y: -1.2
+}
+centroids {
+  id: 2
+  x: -1.5
+  y: 7.3
+}
+
+[03:45:46 AM] : mapper_id: 1
+status: "OK"
+
+[03:45:46 AM] : status: "OK"
+partition {
+  key: 5
+  x: 0.4
+  y: 7.2
+}
+partition {
+  key: 5
+  point_id: 1
+  x: 0.8
+  y: 9.8
+}
+partition {
+  key: 5
+  point_id: 2
+  x: -1.5
+  y: 7.3
+}
+partition {
+  key: 5
+  point_id: 3
+  x: 8.1
+  y: 3.4
+}
+partition {
+  key: 5
+  point_id: 4
+  x: 7.3
+  y: 2.3
+}
+partition {
+  key: 5
+  point_id: 5
+  x: 9.1
+  y: 3.1
+}
+partition {
+  key: 5
+  point_id: 6
+  x: 8.9
+  y: 0.2
+}
+
+[03:45:46 AM] : mapper_id: 2
+status: "OK"
+partition {
+  point_id: 29
+  x: 9.3
+  y: 1.9
+}
+partition {
+  point_id: 30
+  x: 8.6
+  y: 2.6
+}
+
+[03:45:46 AM] : [key: 5
+x: 0.4
+y: 7.2
+, key: 5
+point_id: 1
+x: 0.8
+y: 9.8
+, key: 5
+point_id: 2
+x: -1.5
+y: 7.3
+, key: 5
+point_id: 3
+x: 8.1
+y: 3.4
+, key: 5
+point_id: 4
+x: 7.3
+y: 2.3
+, key: 5
+point_id: 5
+x: 9.1
+y: 3.1
+, key: 5
+point_id: 6
+x: 8.9
+y: 0.2
+, point_id: 29
+x: 9.3
+y: 1.9
+, point_id: 30
+x: 8.6
+y: 2.6
+]
+[03:45:46 AM] : sorted partitions:
+[03:45:46 AM] : {5: [[0, 0.4000000059604645, 7.199999809265137], [1, 0.800000011920929, 9.800000190734863], [2, -1.5, 7.300000190734863], [3, 8.100000381469727, 3.4000000953674316], [4, 7.300000190734863, 2.299999952316284], [5, 9.100000381469727, 3.0999999046325684], [6, 8.899999618530273, 0.20000000298023224]], 0: [[29, 9.300000190734863, 1.899999976158142], [30, 8.600000381469727, 2.5999999046325684]]}
+[03:45:46 AM] : reducer output: [[5, 4.728571512869427, 4.757142878004482], [0, 8.950000286102295, 2.2499999403953552]]
+[03:45:46 AM] : n_mappers: 3
+centroids {
+  id: 29
+  x: 9.3
+  y: 1.9
+}
+centroids {
+  id: 17
+  x: 0.3
+  y: 7.2
+}
+centroids {
+  id: 18
+  x: 0.7
+  y: 9.9
+}
+centroids {
+  id: 15
+  x: 0.9
+  y: 9.6
+}
+centroids {
+  id: 27
+  x: 11.2
+  y: -1.2
+}
+centroids {
+  id: 2
+  x: -1.5
+  y: 7.3
+}
+
+[03:45:46 AM] : mapper_id: 1
+status: "OK"
+
+[03:45:46 AM] : status: "OK"
+partition {
+  key: 5
+  x: 0.4
+  y: 7.2
+}
+partition {
+  key: 5
+  point_id: 1
+  x: 0.8
+  y: 9.8
+}
+partition {
+  key: 5
+  point_id: 2
+  x: -1.5
+  y: 7.3
+}
+partition {
+  key: 5
+  point_id: 3
+  x: 8.1
+  y: 3.4
+}
+partition {
+  key: 5
+  point_id: 4
+  x: 7.3
+  y: 2.3
+}
+partition {
+  key: 5
+  point_id: 5
+  x: 9.1
+  y: 3.1
+}
+partition {
+  key: 5
+  point_id: 6
+  x: 8.9
+  y: 0.2
+}
+
+[03:45:46 AM] : mapper_id: 2
+status: "OK"
+partition {
+  point_id: 29
+  x: 9.3
+  y: 1.9
+}
+partition {
+  point_id: 30
+  x: 8.6
+  y: 2.6
+}
+
+[03:45:46 AM] : [key: 5
+x: 0.4
+y: 7.2
+, key: 5
+point_id: 1
+x: 0.8
+y: 9.8
+, key: 5
+point_id: 2
+x: -1.5
+y: 7.3
+, key: 5
+point_id: 3
+x: 8.1
+y: 3.4
+, key: 5
+point_id: 4
+x: 7.3
+y: 2.3
+, key: 5
+point_id: 5
+x: 9.1
+y: 3.1
+, key: 5
+point_id: 6
+x: 8.9
+y: 0.2
+, point_id: 29
+x: 9.3
+y: 1.9
+, point_id: 30
+x: 8.6
+y: 2.6
+]
+[03:45:46 AM] : sorted partitions:
+[03:45:46 AM] : {5: [[0, 0.4000000059604645, 7.199999809265137], [1, 0.800000011920929, 9.800000190734863], [2, -1.5, 7.300000190734863], [3, 8.100000381469727, 3.4000000953674316], [4, 7.300000190734863, 2.299999952316284], [5, 9.100000381469727, 3.0999999046325684], [6, 8.899999618530273, 0.20000000298023224]], 0: [[29, 9.300000190734863, 1.899999976158142], [30, 8.600000381469727, 2.5999999046325684]]}
+[03:45:46 AM] : reducer output: [[5, 4.728571512869427, 4.757142878004482], [0, 8.950000286102295, 2.2499999403953552]]
+[03:45:47 AM] : n_mappers: 3
+centroids {
+  id: 29
+  x: 9.3
+  y: 1.9
+}
+centroids {
+  id: 17
+  x: 0.3
+  y: 7.2
+}
+centroids {
+  id: 18
+  x: 0.7
+  y: 9.9
+}
+centroids {
+  id: 15
+  x: 0.9
+  y: 9.6
+}
+centroids {
+  id: 27
+  x: 11.2
+  y: -1.2
+}
+centroids {
+  id: 2
+  x: -1.5
+  y: 7.3
+}
+
+[03:45:47 AM] : mapper_id: 1
+status: "OK"
+
+[03:45:47 AM] : status: "OK"
+partition {
+  key: 5
+  x: 0.4
+  y: 7.2
+}
+partition {
+  key: 5
+  point_id: 1
+  x: 0.8
+  y: 9.8
+}
+partition {
+  key: 5
+  point_id: 2
+  x: -1.5
+  y: 7.3
+}
+partition {
+  key: 5
+  point_id: 3
+  x: 8.1
+  y: 3.4
+}
+partition {
+  key: 5
+  point_id: 4
+  x: 7.3
+  y: 2.3
+}
+partition {
+  key: 5
+  point_id: 5
+  x: 9.1
+  y: 3.1
+}
+partition {
+  key: 5
+  point_id: 6
+  x: 8.9
+  y: 0.2
+}
+
+[03:45:47 AM] : mapper_id: 2
+status: "OK"
+partition {
+  point_id: 29
+  x: 9.3
+  y: 1.9
+}
+partition {
+  point_id: 30
+  x: 8.6
+  y: 2.6
+}
+
+[03:45:47 AM] : [key: 5
+x: 0.4
+y: 7.2
+, key: 5
+point_id: 1
+x: 0.8
+y: 9.8
+, key: 5
+point_id: 2
+x: -1.5
+y: 7.3
+, key: 5
+point_id: 3
+x: 8.1
+y: 3.4
+, key: 5
+point_id: 4
+x: 7.3
+y: 2.3
+, key: 5
+point_id: 5
+x: 9.1
+y: 3.1
+, key: 5
+point_id: 6
+x: 8.9
+y: 0.2
+, point_id: 29
+x: 9.3
+y: 1.9
+, point_id: 30
+x: 8.6
+y: 2.6
+]
+[03:45:47 AM] : sorted partitions:
+[03:45:47 AM] : {5: [[0, 0.4000000059604645, 7.199999809265137], [1, 0.800000011920929, 9.800000190734863], [2, -1.5, 7.300000190734863], [3, 8.100000381469727, 3.4000000953674316], [4, 7.300000190734863, 2.299999952316284], [5, 9.100000381469727, 3.0999999046325684], [6, 8.899999618530273, 0.20000000298023224]], 0: [[29, 9.300000190734863, 1.899999976158142], [30, 8.600000381469727, 2.5999999046325684]]}
+[03:45:47 AM] : reducer output: [[5, 4.728571512869427, 4.757142878004482], [0, 8.950000286102295, 2.2499999403953552]]
+[03:45:47 AM] : n_mappers: 3
+centroids {
+  id: 29
+  x: 9.3
+  y: 1.9
+}
+centroids {
+  id: 17
+  x: 0.3
+  y: 7.2
+}
+centroids {
+  id: 18
+  x: 0.7
+  y: 9.9
+}
+centroids {
+  id: 15
+  x: 0.9
+  y: 9.6
+}
+centroids {
+  id: 27
+  x: 11.2
+  y: -1.2
+}
+centroids {
+  id: 2
+  x: -1.5
+  y: 7.3
+}
+
+[03:45:47 AM] : mapper_id: 1
+status: "OK"
+
+[03:45:47 AM] : status: "OK"
+partition {
+  key: 5
+  x: 0.4
+  y: 7.2
+}
+partition {
+  key: 5
+  point_id: 1
+  x: 0.8
+  y: 9.8
+}
+partition {
+  key: 5
+  point_id: 2
+  x: -1.5
+  y: 7.3
+}
+partition {
+  key: 5
+  point_id: 3
+  x: 8.1
+  y: 3.4
+}
+partition {
+  key: 5
+  point_id: 4
+  x: 7.3
+  y: 2.3
+}
+partition {
+  key: 5
+  point_id: 5
+  x: 9.1
+  y: 3.1
+}
+partition {
+  key: 5
+  point_id: 6
+  x: 8.9
+  y: 0.2
+}
+
+[03:45:47 AM] : mapper_id: 2
+status: "OK"
+partition {
+  point_id: 29
+  x: 9.3
+  y: 1.9
+}
+partition {
+  point_id: 30
+  x: 8.6
+  y: 2.6
+}
+
+[03:45:47 AM] : [key: 5
+x: 0.4
+y: 7.2
+, key: 5
+point_id: 1
+x: 0.8
+y: 9.8
+, key: 5
+point_id: 2
+x: -1.5
+y: 7.3
+, key: 5
+point_id: 3
+x: 8.1
+y: 3.4
+, key: 5
+point_id: 4
+x: 7.3
+y: 2.3
+, key: 5
+point_id: 5
+x: 9.1
+y: 3.1
+, key: 5
+point_id: 6
+x: 8.9
+y: 0.2
+, point_id: 29
+x: 9.3
+y: 1.9
+, point_id: 30
+x: 8.6
+y: 2.6
+]
+[03:45:47 AM] : sorted partitions:
+[03:45:47 AM] : {5: [[0, 0.4000000059604645, 7.199999809265137], [1, 0.800000011920929, 9.800000190734863], [2, -1.5, 7.300000190734863], [3, 8.100000381469727, 3.4000000953674316], [4, 7.300000190734863, 2.299999952316284], [5, 9.100000381469727, 3.0999999046325684], [6, 8.899999618530273, 0.20000000298023224]], 0: [[29, 9.300000190734863, 1.899999976158142], [30, 8.600000381469727, 2.5999999046325684]]}
+[03:45:47 AM] : reducer output: [[5, 4.728571512869427, 4.757142878004482], [0, 8.950000286102295, 2.2499999403953552]]
+[03:45:47 AM] : n_mappers: 3
+centroids {
+  id: 29
+  x: 9.3
+  y: 1.9
+}
+centroids {
+  id: 17
+  x: 0.3
+  y: 7.2
+}
+centroids {
+  id: 18
+  x: 0.7
+  y: 9.9
+}
+centroids {
+  id: 15
+  x: 0.9
+  y: 9.6
+}
+centroids {
+  id: 27
+  x: 11.2
+  y: -1.2
+}
+centroids {
+  id: 2
+  x: -1.5
+  y: 7.3
+}
+
+[03:45:47 AM] : mapper_id: 1
+status: "OK"
+
+[03:45:47 AM] : status: "OK"
+partition {
+  key: 5
+  x: 0.4
+  y: 7.2
+}
+partition {
+  key: 5
+  point_id: 1
+  x: 0.8
+  y: 9.8
+}
+partition {
+  key: 5
+  point_id: 2
+  x: -1.5
+  y: 7.3
+}
+partition {
+  key: 5
+  point_id: 3
+  x: 8.1
+  y: 3.4
+}
+partition {
+  key: 5
+  point_id: 4
+  x: 7.3
+  y: 2.3
+}
+partition {
+  key: 5
+  point_id: 5
+  x: 9.1
+  y: 3.1
+}
+partition {
+  key: 5
+  point_id: 6
+  x: 8.9
+  y: 0.2
+}
+
+[03:45:47 AM] : mapper_id: 2
+status: "OK"
+partition {
+  point_id: 29
+  x: 9.3
+  y: 1.9
+}
+partition {
+  point_id: 30
+  x: 8.6
+  y: 2.6
+}
+
+[03:45:47 AM] : [key: 5
+x: 0.4
+y: 7.2
+, key: 5
+point_id: 1
+x: 0.8
+y: 9.8
+, key: 5
+point_id: 2
+x: -1.5
+y: 7.3
+, key: 5
+point_id: 3
+x: 8.1
+y: 3.4
+, key: 5
+point_id: 4
+x: 7.3
+y: 2.3
+, key: 5
+point_id: 5
+x: 9.1
+y: 3.1
+, key: 5
+point_id: 6
+x: 8.9
+y: 0.2
+, point_id: 29
+x: 9.3
+y: 1.9
+, point_id: 30
+x: 8.6
+y: 2.6
+]
+[03:45:47 AM] : sorted partitions:
+[03:45:47 AM] : {5: [[0, 0.4000000059604645, 7.199999809265137], [1, 0.800000011920929, 9.800000190734863], [2, -1.5, 7.300000190734863], [3, 8.100000381469727, 3.4000000953674316], [4, 7.300000190734863, 2.299999952316284], [5, 9.100000381469727, 3.0999999046325684], [6, 8.899999618530273, 0.20000000298023224]], 0: [[29, 9.300000190734863, 1.899999976158142], [30, 8.600000381469727, 2.5999999046325684]]}
+[03:45:47 AM] : reducer output: [[5, 4.728571512869427, 4.757142878004482], [0, 8.950000286102295, 2.2499999403953552]]
+[03:45:47 AM] : n_mappers: 3
+centroids {
+  id: 29
+  x: 9.3
+  y: 1.9
+}
+centroids {
+  id: 17
+  x: 0.3
+  y: 7.2
+}
+centroids {
+  id: 18
+  x: 0.7
+  y: 9.9
+}
+centroids {
+  id: 15
+  x: 0.9
+  y: 9.6
+}
+centroids {
+  id: 27
+  x: 11.2
+  y: -1.2
+}
+centroids {
+  id: 2
+  x: -1.5
+  y: 7.3
+}
+
+[03:45:47 AM] : mapper_id: 1
+status: "OK"
+
+[03:45:47 AM] : status: "OK"
+partition {
+  key: 5
+  x: 0.4
+  y: 7.2
+}
+partition {
+  key: 5
+  point_id: 1
+  x: 0.8
+  y: 9.8
+}
+partition {
+  key: 5
+  point_id: 2
+  x: -1.5
+  y: 7.3
+}
+partition {
+  key: 5
+  point_id: 3
+  x: 8.1
+  y: 3.4
+}
+partition {
+  key: 5
+  point_id: 4
+  x: 7.3
+  y: 2.3
+}
+partition {
+  key: 5
+  point_id: 5
+  x: 9.1
+  y: 3.1
+}
+partition {
+  key: 5
+  point_id: 6
+  x: 8.9
+  y: 0.2
+}
+
+[03:45:47 AM] : mapper_id: 2
+status: "OK"
+partition {
+  point_id: 29
+  x: 9.3
+  y: 1.9
+}
+partition {
+  point_id: 30
+  x: 8.6
+  y: 2.6
+}
+
+[03:45:47 AM] : [key: 5
+x: 0.4
+y: 7.2
+, key: 5
+point_id: 1
+x: 0.8
+y: 9.8
+, key: 5
+point_id: 2
+x: -1.5
+y: 7.3
+, key: 5
+point_id: 3
+x: 8.1
+y: 3.4
+, key: 5
+point_id: 4
+x: 7.3
+y: 2.3
+, key: 5
+point_id: 5
+x: 9.1
+y: 3.1
+, key: 5
+point_id: 6
+x: 8.9
+y: 0.2
+, point_id: 29
+x: 9.3
+y: 1.9
+, point_id: 30
+x: 8.6
+y: 2.6
+]
+[03:45:47 AM] : sorted partitions:
+[03:45:47 AM] : {5: [[0, 0.4000000059604645, 7.199999809265137], [1, 0.800000011920929, 9.800000190734863], [2, -1.5, 7.300000190734863], [3, 8.100000381469727, 3.4000000953674316], [4, 7.300000190734863, 2.299999952316284], [5, 9.100000381469727, 3.0999999046325684], [6, 8.899999618530273, 0.20000000298023224]], 0: [[29, 9.300000190734863, 1.899999976158142], [30, 8.600000381469727, 2.5999999046325684]]}
+[03:45:47 AM] : reducer output: [[5, 4.728571512869427, 4.757142878004482], [0, 8.950000286102295, 2.2499999403953552]]
+[03:45:47 AM] : n_mappers: 3
+centroids {
+  id: 29
+  x: 9.3
+  y: 1.9
+}
+centroids {
+  id: 17
+  x: 0.3
+  y: 7.2
+}
+centroids {
+  id: 18
+  x: 0.7
+  y: 9.9
+}
+centroids {
+  id: 15
+  x: 0.9
+  y: 9.6
+}
+centroids {
+  id: 27
+  x: 11.2
+  y: -1.2
+}
+centroids {
+  id: 2
+  x: -1.5
+  y: 7.3
+}
+
+[03:45:47 AM] : mapper_id: 1
+status: "OK"
+
+[03:45:47 AM] : mapper_id: 2
+status: "OK"
+partition {
+  point_id: 29
+  x: 9.3
+  y: 1.9
+}
+partition {
+  point_id: 30
+  x: 8.6
+  y: 2.6
+}
+
+[03:45:47 AM] : status: "OK"
+partition {
+  key: 5
+  x: 0.4
+  y: 7.2
+}
+partition {
+  key: 5
+  point_id: 1
+  x: 0.8
+  y: 9.8
+}
+partition {
+  key: 5
+  point_id: 2
+  x: -1.5
+  y: 7.3
+}
+partition {
+  key: 5
+  point_id: 3
+  x: 8.1
+  y: 3.4
+}
+partition {
+  key: 5
+  point_id: 4
+  x: 7.3
+  y: 2.3
+}
+partition {
+  key: 5
+  point_id: 5
+  x: 9.1
+  y: 3.1
+}
+partition {
+  key: 5
+  point_id: 6
+  x: 8.9
+  y: 0.2
+}
+
+[03:45:47 AM] : [point_id: 29
+x: 9.3
+y: 1.9
+, point_id: 30
+x: 8.6
+y: 2.6
+, key: 5
+x: 0.4
+y: 7.2
+, key: 5
+point_id: 1
+x: 0.8
+y: 9.8
+, key: 5
+point_id: 2
+x: -1.5
+y: 7.3
+, key: 5
+point_id: 3
+x: 8.1
+y: 3.4
+, key: 5
+point_id: 4
+x: 7.3
+y: 2.3
+, key: 5
+point_id: 5
+x: 9.1
+y: 3.1
+, key: 5
+point_id: 6
+x: 8.9
+y: 0.2
+]
+[03:45:47 AM] : sorted partitions:
+[03:45:47 AM] : {0: [[29, 9.300000190734863, 1.899999976158142], [30, 8.600000381469727, 2.5999999046325684]], 5: [[0, 0.4000000059604645, 7.199999809265137], [1, 0.800000011920929, 9.800000190734863], [2, -1.5, 7.300000190734863], [3, 8.100000381469727, 3.4000000953674316], [4, 7.300000190734863, 2.299999952316284], [5, 9.100000381469727, 3.0999999046325684], [6, 8.899999618530273, 0.20000000298023224]]}
+[03:45:47 AM] : reducer output: [[0, 8.950000286102295, 2.2499999403953552], [5, 4.728571512869427, 4.757142878004482]]
