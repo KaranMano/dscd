@@ -95,6 +95,10 @@ def partition_batch(mapped_batch):
     # pprint(partitions)
     return partitions
 
+def invoke_mapper(id):
+    print(f"mapper-{id} invoked! PID={os.getpid()} parentPID={os.getppid()}")
+    pass
+
 if __name__ == "__main__":
     mapped_batch = map_batch()
     partitioned_batch = partition_batch(mapped_batch)
